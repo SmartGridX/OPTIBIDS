@@ -112,7 +112,7 @@ ollama --version
 ### 🚀 Getting Started
 Before step 1, ensure you git clone the repository and navigate into it:
 ``` 
-git clone https://github.com/SmartGridX/OPTIBIDS-.git
+git clone https://github.com/SmartGridX/OPTIBIDS.git
 ```
 
 🐳 Step 1: Start Docker Services
