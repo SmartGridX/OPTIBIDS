@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Accepted Offers — OPTIBIDS</title>
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+
+<body>
+
+<nav class="dash-navbar">
+  <div class="dash-logo">OPTIBIDS-RFP</div>
+ <ul class="dash-menu">
+  <li><a href="applicant_dashboard.html" class="active">Dashboard</a></li>
+  <li><a href="applicant_accepted.html">Accepted Offers</a></li>
+  <li><a onclick="applicant.showNotifications()" style="cursor:pointer;">Notifications</a></li>
+  <li><a onclick="auth.logout()" style="cursor:pointer;">Logout</a></li>
+</ul>
+</nav>
+
+<div class="dash-container">
+  <div class="section-card">
+    <h2>Accepted Offers</h2>
+    <div id="accepted-box" class="card-list"></div>
+  </div>
+</div>
+
+<script src="../js/api.js"></script>
+<script src="../js/auth.js"></script>
+<script>
+async function loadAccepted() {
+  const box = document.getElementById("accepted-box");
+
+  try {
+    const data = await api.get("/applicant/accepted");
+
+    if (!data.length) {
+      box.innerHTML = "<p class='muted'>No accepted offers yet.</p>";
+      return;
+    }
+
+    box.innerHTML = "";
+    data.forEach(o => {
+      const div = document.createElement("div");
+      div.className = "item status-accepted";
+      div.innerHTML = `
+        <h3>${o.tender_title}</h3>
+        <p>${o.offer?.message || ""}</p>
+        <p class="kv">Status: Accepted</p>
+      `;
+      box.appendChild(div);
+    });
+
+  } catch (e) {
+    box.innerHTML = "<p class='muted'>Failed to load accepted offers.</p>";
+  }
+}
+
+loadAccepted();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Sign Up — OPTIBIDS</title>
+
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+
+<body data-theme="dark">
+
+  <nav class="dash-navbar">
+    <div class="dash-logo" onclick="location.href='index.html'">OPTIBIDS-RFP</div>
+    <ul class="dash-menu">
+      <li><a href="login.html">Login</a></li>
+    </ul>
+  </nav>
+
+  <main class="auth-container">
+    <div class="auth-card">
+      <h2>Create Account</h2>
+      <p class="muted">Register as Admin or Applicant</p>
+
+      <input id="su-email" class="auth-input" type="email" placeholder="Email">
+      <input id="su-password" class="auth-input" type="password" placeholder="Password">
+      <input id="su-password-confirm" class="auth-input" type="password" placeholder="Confirm Password">
+
+      <select id="su-role" class="auth-input">
+        <option value="applicant">Applicant</option>
+        <option value="admin">Admin</option>
+      </select>
+
+      <button class="auth-btn primary" onclick="auth.signup()">Create Account</button>
+
+      <p class="muted center">Already registered? <a href="login.html">Login</a></p>
+    </div>
+  </main>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+
+</body>
+</html>

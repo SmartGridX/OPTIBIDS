@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Dashboard — OPTIBIDS-RFP</title>
+
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+
+<body>
+
+<nav class="dash-navbar">
+  <div class="dash-logo">OPTIBIDS-RFP</div>
+  <ul class="dash-menu">
+    <li><a href="admin_dashboard.html" class="active">Dashboard</a></li>
+    <li><a href="create_tender.html">Create Tender</a></li>
+    <li><a href="admin_accepted.html">Accepted Offers</a></li>
+    <li><a onclick="auth.logout()" style="cursor:pointer;">Logout</a></li>
+  </ul>
+    
+</nav>
+
+<main class="dash-container">
+
+  <section class="section-card">
+    <h2>Recent Applications</h2>
+    <div id="recent-apps" class="card-list"></div>
+  </section>
+
+  <section class="section-card" style="margin-top:2rem;">
+    <h2>All Tenders</h2>
+    <div id="tenders-list" class="card-list"></div>
+  </section>
+
+</main>
+
+<script src="../js/api.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/admin.js"></script>
+
+<script>
+document.querySelectorAll(".dash-menu a").forEach(link => {
+  if (link.href === window.location.href) {
+    link.classList.add("active");
+  }
+});
+</script>
+
+</body>
+</html>
