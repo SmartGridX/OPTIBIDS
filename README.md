@@ -96,9 +96,9 @@ AI_Agent/
 
 Make sure you have:
 
-Docker ≥ 24
+1. Docker ≥ 24
 
-Docker Compose
+2. Docker Compose
 
 Ollama installed locally
 👉 https://ollama.com
@@ -154,60 +154,60 @@ Register Admin
 
 Role: admin
 
-Used to create tenders & send offers
+- Used to create tenders & send offers
 
-Register Applicant
+- Register Applicant
 
-Role: applicant
+- Role: applicant
 
-Used to submit proposals
+- Used to submit proposals
 
 🧪 Step 5: Test Workflow
 Admin Flow
 
-Login as Admin
+- Login as Admin
 
-Create a Tender
+- Create a Tender
 
-View Applications
+- View Applications
 
-Generate AI Summary
+- Generate AI Summary
 
-Send Offer
+- Send Offer
 
-Applicant Flow
+- Applicant Flow
 
-Login as Applicant
+- Login as Applicant
 
-Browse Public Tenders
+- Browse Public Tenders
 
-Submit Proposal
+- Submit Proposal
 
-Receive Offer
+- Receive Offer
 
-Accept / Reject Offer
+- Accept / Reject Offer
 
-View Accepted Offers
+- View Accepted Offers
 
 🤖 AI Evaluation Pipeline (Internal)
 
-Requirement Extraction (LLM)
+1. Requirement Extraction (LLM)
 
-SKU Embedding & Matching
+2. SKU Embedding & Matching
 
-Pricing Calculation
+3. Pricing Calculation
 
-Proposal Consolidation
+4. Proposal Consolidation   
 
-Best Applicant Selection
+5. Best Applicant Selection
 
 🔐 Authentication
 
-JWT-based authentication
+- JWT-based authentication
 
-Role-based access control
+- Role-based access control
 
-Secure token handling
+- Secure token handling
 
 📄 Environment Variables (Optional)
 
@@ -216,36 +216,37 @@ Create .env if needed:
 SECRET_KEY=your_secret_key_here
 
 🧹 Clean Shutdown
+```
 docker compose down
-
+```
 
 To remove volumes:
-
+```
 docker compose down -v
-
+```
 🧠 Model Notes
 
 phi3:mini was chosen for:
 
-Low memory footprint
+- Low memory footprint
 
-Fast inference
+- Fast inference
 
-Offline capability
+- Offline capability
 
 You can swap models easily via Ollama
 
 🚀 Future Enhancements
 
-Multi-currency pricing
+- Multi-currency pricing
 
-Vendor scoring dashboard
+- Vendor scoring dashboard
 
-PDF proposal export
+- PDF proposal export
 
-Cloud deployment
+- Cloud deployment
 
-RAG-based tender understanding
+- RAG-based tender understanding
 
 ---
 
@@ -253,8 +254,8 @@ RAG-based tender understanding
 
 OPTIBIDS demonstrates how AI can modernize enterprise procurement by:
 
-Reducing manual evaluation
+- Reducing manual evaluation
 
-Improving fairness and transparency
+- Improving fairness and transparency
 
-Accelerating decision-making
+- Accelerating decision-making
