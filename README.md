@@ -2,15 +2,15 @@
 
 OPTIBIDS is a B2B AI-driven Request for Proposal (RFP) and Tender Management platform that automates:
 
-Tender publishing
+- Tender publishing
 
-Vendor application submissions
+- Vendor application submissions
 
-AI-based proposal analysis
+- AI-based proposal analysis
 
-SKU-based pricing estimation
+- SKU-based pricing estimation
 
-Offer negotiation and acceptance tracking
+- Offer negotiation and acceptance tracking
 
 The system is designed for enterprise procurement teams and vendors to collaborate efficiently using AI assistance.
 
@@ -19,43 +19,43 @@ The system is designed for enterprise procurement teams and vendors to collabora
 ### 🧠 Key Features
 Admin (Buyer)
 
-Create and publish tenders
+- Create and publish tenders
 
-Upload supporting documents
+- Upload supporting documents
 
-View all vendor applications
+- View all vendor applications
 
-Generate AI summaries of proposals
+- Generate AI summaries of proposals
 
-Compare applicants objectively
+- Compare applicants objectively
 
-Send offers to selected vendors
+- Send offers to selected vendors
 
-Track accepted/rejected offers
+- Track accepted/rejected offers
 
-Applicant (Vendor)
+- Applicant (Vendor)
 
-Browse public tenders
+- Browse public tenders
 
-Submit technical & pricing proposals
+- Submit technical & pricing proposals
 
-Receive offers from admins
+- Receive offers from admins
 
-Accept or reject offers
+- Accept or reject offers
 
-View accepted contracts
+- View accepted contracts
 
-AI Capabilities
+- AI Capabilities
 
-Requirement extraction from tender text
+- Requirement extraction from tender text
 
-Semantic SKU matching
+- Semantic SKU matching
 
-Automated pricing computation
+- Automated pricing computation
 
-AI-generated proposal summaries
+- AI-generated proposal summaries
 
-Best-applicant recommendation using LLM
+- Best-applicant recommendation using LLM
 
 --- 
 🏗️ Tech Stack
