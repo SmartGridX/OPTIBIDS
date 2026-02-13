@@ -1,6 +1,6 @@
-# OPTIBIDS — AI-Powered RFP & Tender Evaluation Platform
+# OPTIBOTS — AI-Powered RFP & Tender Evaluation Platform
 
-OPTIBIDS is a B2B AI-driven Request for Proposal (RFP) and Tender Management platform that automates:
+OPTIBOTS is a B2B AI-driven Request for Proposal (RFP) and Tender Management platform that automates:
 
 - Tender publishing
 
@@ -112,7 +112,7 @@ ollama --version
 ### 🚀 Getting Started
 Before step 1, ensure you git clone the repository and navigate into it:
 ``` 
-git clone https://github.com/SmartGridX/OPTIBIDS.git
+git clone https://github.com/SmartGridX/OPTIBOTS.git
 ```
 
 🐳 Step 1: Start Docker Services
@@ -252,11 +252,10 @@ You can swap models easily via Ollama
 
 🏁 Conclusion
 
-OPTIBIDS demonstrates how AI can modernize enterprise procurement by:
+OPTIBOTS demonstrates how AI can modernize enterprise procurement by:
 
 - Reducing manual evaluation
 
 - Improving fairness and transparency
 
 - Accelerating decision-making
->>>>>>> 255c713de0c76f0756666b03b6cccc2353aec8a2
