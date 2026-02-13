@@ -1,54 +1,262 @@
-# Agentic AI for RFP Automation — FMCG (Asian Paints)
+# OPTIBIDS — AI-Powered RFP & Tender Evaluation Platform
 
-**Agentic AI for RFP Automation** is an AI-driven system that uses multiple intelligent agents to automatically detect, analyze, and respond to RFPs for FMCG companies like **Asian Paints**, reducing manual work and speeding up the proposal process.
+OPTIBIDS is a B2B AI-driven Request for Proposal (RFP) and Tender Management platform that automates:
 
----
+- Tender publishing
 
-## 📄 Project Overview
+- Vendor application submissions
 
-The **Agentic AI for RFP Automation** project is designed to streamline and automate the entire **Request for Proposal (RFP)** process for FMCG companies like **Asian Paints**.  
+- AI-based proposal analysis
 
-Using multiple intelligent AI agents, the system can automatically **detect new RFPs, extract requirements, match products (SKUs), calculate dynamic pricing, generate proposal responses, and orchestrate delivery**.  
+- SKU-based pricing estimation
 
-This reduces manual effort, speeds up response times, and improves accuracy, helping companies respond to more opportunities efficiently and gain a competitive edge in procurement and tender processes.
+- Offer negotiation and acceptance tracking
 
----
-
-## 🚀 Key Features
-
-- **Automated RFP Monitoring** – Continuously tracks and ingests RFPs from procurement portals using webhook-based notifications.  
-- **LLM Extraction** – Utilizes modern Large Language Models (LLMs) for semantic extraction and accurate parsing of RFP requirements.  
-- **Intelligent SKU Matching** – Employs vector search and domain-specific rules to map RFP specifications to existing product SKUs and inventory.  
-- **Dynamic Pricing** – Uses a rule-driven pricing engine that adapts quotations based on real-time market signals and internal cost parameters.
+The system is designed for enterprise procurement teams and vendors to collaborate efficiently using AI assistance.
 
 ---
 
-## ⚙️ Technology Stack
+### 🧠 Key Features
+Admin (Buyer)
 
-- **Workflow Orchestration** - n8n  
-- **Backend Framework** - FastAPI  
-- **LLM Model** - OpenAI GPT-4 (or Gemini / Llama-3)  
-- **Database** - PostgreSQL  
-- **Frontend (Dashboard)** - React.js  
-- **Hosting (Free Tier)** - Render / Railway / Vercel  
-- **Vector Matching** - Chroma / FAISS
+- Create and publish tenders
+
+- Upload supporting documents
+
+- View all vendor applications
+
+- Generate AI summaries of proposals
+
+- Compare applicants objectively
+
+- Send offers to selected vendors
+
+- Track accepted/rejected offers
+
+- Applicant (Vendor)
+
+- Browse public tenders
+
+- Submit technical & pricing proposals
+
+- Receive offers from admins
+
+- Accept or reject offers
+
+- View accepted contracts
+
+- AI Capabilities
+
+- Requirement extraction from tender text
+
+- Semantic SKU matching
+
+- Automated pricing computation
+
+- AI-generated proposal summaries
+
+- Best-applicant recommendation using LLM
+
+--- 
+🏗️ Tech Stack
+Layer	Technology
+Backend	FastAPI + SQLModel
+Frontend	HTML, CSS, Vanilla JS
+Database	SQLite
+AI Engine	Ollama (phi3:mini)
+Containers	Docker + Docker Compose
+Reverse Proxy	Nginx
+📦 Project Structure
+```
+AI_Agent/
+├── backend/
+│   ├── app/
+│   │   ├── routes_*.py
+│   │   ├── pipeline.py
+│   │   ├── models.py
+│   │   ├── auth_helpers.py
+│   │   └── main.py
+│   └── Dockerfile
+│
+├── frontend/
+│   ├── admin/
+│   ├── applicant/
+│   ├── css/
+│   ├── js/
+│   └── Dockerfile
+│
+├── docker-compose.yml
+├── requirements.txt
+└── README.md
+```
 
 ---
 
-## 🏗️ System Architecture
+### ⚙️ Prerequisites
 
-The system uses multiple AI agents working together to automate the RFP process. Data flows from procurement platforms into the AI agents, which analyze, match, price, and generate proposals. Workflow automation ensures smooth orchestration from start to finish.
+Make sure you have:
 
-**🔄 Workflow Overview**  
-1. **Monitor RFPs** – Detect new RFPs automatically.  
-2. **Extract Requirements** – AI reads and understands RFPs.  
-3. **Match SKUs** – Finds products that fit the RFP.  
-4. **Dynamic Pricing** – Calculates smart pricing based on rules and market data.  
-5. **Consolidate Responses** – Creates the proposal automatically.  
-6. **Orchestrate Delivery** – Ensures all steps are completed and delivered smoothly.  
+1. Docker ≥ 24
+
+2. Docker Compose
+
+Ollama installed locally
+👉 https://ollama.com
+
+Check installation:
+```
+docker --version
+docker compose version
+ollama --version
+```
+### 🚀 Getting Started
+Before step 1, ensure you git clone the repository and navigate into it:
+``` 
+git clone https://github.com/SmartGridX/OPTIBIDS.git
+```
+
+🐳 Step 1: Start Docker Services
+
+From the project root directory:
+```
+docker compose up --build
+```
+
+This will start:
+
+Backend (FastAPI)
+
+Frontend (Nginx)
+
+AI agent integration (Ollama via API)
+To stop services, press `CTRL + C` and run:
+```
+docker compose down --volumes
+```
+
+🌐 Step 2: Access the Application
+Service	URL
+Frontend	http://localhost:3000
+
+Backend API	http://localhost:8000
+
+Ollama API	http://localhost:11434
+
+🔧 Step 3: Initial Setup
+pull phi3:mini model for local AI inference:
+
+```
+docker exec -it ollama ollama pull phi3:mini        
+```
+note:  make sure that you run this command only after the ollama container is up and running.
+👤 Step 4: Create Accounts
+Register Admin
+
+Role: admin
+
+- Used to create tenders & send offers
+
+- Register Applicant
+
+- Role: applicant
+
+- Used to submit proposals
+
+🧪 Step 5: Test Workflow
+Admin Flow
+
+- Login as Admin
+
+- Create a Tender
+
+- View Applications
+
+- Generate AI Summary
+
+- Send Offer
+
+- Applicant Flow
+
+- Login as Applicant
+
+- Browse Public Tenders
+
+- Submit Proposal
+
+- Receive Offer
+
+- Accept / Reject Offer
+
+- View Accepted Offers
+
+🤖 AI Evaluation Pipeline (Internal)
+
+1. Requirement Extraction (LLM)
+
+2. SKU Embedding & Matching
+
+3. Pricing Calculation
+
+4. Proposal Consolidation   
+
+5. Best Applicant Selection
+
+🔐 Authentication
+
+- JWT-based authentication
+
+- Role-based access control
+
+- Secure token handling
+
+📄 Environment Variables (Optional)
+
+Create .env if needed:
+
+SECRET_KEY=your_secret_key_here
+
+🧹 Clean Shutdown
+```
+docker compose down
+```
+
+To remove volumes:
+```
+docker compose down -v
+```
+🧠 Model Notes
+
+phi3:mini was chosen for:
+
+- Low memory footprint
+
+- Fast inference
+
+- Offline capability
+
+You can swap models easily via Ollama
+
+🚀 Future Enhancements
+
+- Multi-currency pricing
+
+- Vendor scoring dashboard
+
+- PDF proposal export
+
+- Cloud deployment
+
+- RAG-based tender understanding
 
 ---
 
-## 🔚 Conclusion
+🏁 Conclusion
 
-**Agentic AI for RFP Automation** helps FMCG companies like **Asian Paints** automate the RFP process, saving time, reducing manual work, and improving proposal accuracy.
+OPTIBIDS demonstrates how AI can modernize enterprise procurement by:
+
+- Reducing manual evaluation
+
+- Improving fairness and transparency
+
+- Accelerating decision-making
+>>>>>>> 255c713de0c76f0756666b03b6cccc2353aec8a2

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Review Application</title>
+  <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+
+<nav class="dash-navbar">
+  <div class="dash-logo">OPTIBIDS-RFP</div>
+  <ul class="dash-menu">
+    <li><a href="admin_dashboard.html">Dashboard</a></li>
+    <li><a onclick="auth.logout()">Logout</a></li>
+  </ul>
+</nav>
+
+<div class="form-container">
+  <div class="form-card">
+    <h2>Application Review</h2>
+
+    <pre id="app-text"></pre>
+
+    <textarea id="offer-text"
+      placeholder="Write offer details here..."
+      class="auth-input"></textarea>
+
+    <button class="auth-btn primary"
+      onclick="admin.sendOffer()">
+      Send Offer
+    </button>
+  </div>
+</div>
+
+<script src="../js/api.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/admin.js"></script>
+<script>
+  admin.loadApplicationForReview();
+</script>
+
+</body>
+</html>

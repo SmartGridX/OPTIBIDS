@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Login — OPTIBIDS</title>
+
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+
+<body data-theme="dark">
+
+  <nav class="dash-navbar">
+    <div class="dash-logo" onclick="location.href='index.html'">OPTIBIDS-RFP</div>
+    <ul class="dash-menu">
+      <li><a href="signup.html">Sign up</a></li>
+    </ul>
+  </nav>
+
+  <main class="auth-container">
+    <div class="auth-card">
+      <h2>Welcome Back</h2>
+      <p class="muted">Login to continue</p>
+
+      <input id="email" class="auth-input" type="email" placeholder="Email">
+      <input id="password" class="auth-input" type="password" placeholder="Password">
+
+      <button class="auth-btn" onclick="auth.login()">Login</button>
+
+      <p class="muted center">New user? <a href="signup.html">Create account</a></p>
+    </div>
+  </main>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+
+</body>
+</html>

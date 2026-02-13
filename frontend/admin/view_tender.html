@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Tender Details</title>
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+<body>
+
+<nav class="dash-navbar">
+  <div class="dash-logo">OPTIBIDS-RFP</div>
+  <ul class="dash-menu">
+    <li><a href="admin_dashboard.html">Dashboard</a></li>
+    <li><a onclick="auth.logout()">Logout</a></li>
+  </ul>
+</nav>
+
+<main class="dash-container">
+
+  <section class="section-card">
+    <h2 id="title"></h2>
+    <p id="description" class="muted"></p>
+
+    <div id="file-box" style="margin:1rem 0;"></div>
+
+    <h3>Applications</h3>
+    <div id="apps-box" class="card-list"></div>
+  </section>
+
+</main>
+
+
+<script src="../js/api.js"></script>
+<script src="../js/auth.js"></script>
+<script>
+const tenderId = parseInt(localStorage.getItem("view_tender_id"));
+
+(async () => {
+  const tenders = await api.get("/admin/tenders");
+  const t = tenders.find(x => x.id === tenderId);
+
+  document.getElementById("title").innerText = t.title;
+  document.getElementById("description").innerText = t.description;
+
+  if (t.filename) {
+    document.getElementById("file-box").innerHTML =
+      `<a class="auth-btn" href="http://localhost:8000/download/${t.filename}">Download attachment</a>`;
+  }
+
+  const apps = await api.get("/admin/applications");
+  const related = apps.filter(a => a.tender_id === tenderId);
+
+  const box = document.getElementById("apps-box");
+  related.forEach(a => {
+    box.innerHTML += `
+      <div class="tender-item">
+        <b>${a.user_email}</b><br>
+        ${a.text}<br><br>
+        <button class="auth-btn" onclick="location.href='review_application.html'">Open</button>
+      </div>
+    `;
+  });
+})();
+</script>
+
+</body>
+</html>

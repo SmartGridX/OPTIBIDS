@@ -1,0 +1,65 @@
+/* ===============================
+   OPTIBIDS – DASHBOARD THEME
+================================ */
+
+body{
+  background:
+    radial-gradient(1000px 500px at 10% -10%, rgba(99,102,241,.10), transparent),
+    radial-gradient(900px 450px at 90% 10%, rgba(34,197,94,.08), transparent),
+    var(--bg);
+}
+
+/* -------------------------------
+   LIST ITEMS
+-------------------------------- */
+.tender-item,
+.card-list .item{
+  background:var(--surface);
+  border:1px solid rgba(255,255,255,0.06);
+  border-radius:14px;
+  padding:1.3rem;
+  margin-bottom:1rem;
+  transition:.25s ease;
+}
+
+.tender-item:hover,
+.card-list .item:hover{
+  background:var(--surface-strong);
+  transform:translateY(-2px);
+}
+
+/* -------------------------------
+   CARD ACTIONS
+-------------------------------- */
+.card-actions{
+  display:flex;
+  gap:.6rem;
+  margin-top:.9rem;
+}
+
+/* -------------------------------
+   STATUS BARS (ONLY ON ITEMS)
+-------------------------------- */
+.card-list .item.status-submitted{
+  border-left:4px solid #9ca3af;
+}
+
+.card-list .item.status-offered{
+  border-left:4px solid #f59e0b;
+}
+
+.card-list .item.status-accepted{
+  border-left:4px solid #22c55e;
+}
+
+.card-list .item.status-rejected{
+  border-left:4px solid #ef4444;
+}
+
+/* 🔑 PREVENT STRAY LINE LEAKS */
+.section-card.status-accepted,
+.section-card.status-offered,
+.section-card.status-submitted,
+.section-card.status-rejected{
+  border-left:none;
+}

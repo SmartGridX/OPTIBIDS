@@ -1,0 +1,209 @@
+/* ===============================
+   OPTIBIDS – BASE STYLES
+================================ */
+
+:root{
+  --bg:#0b0b10;
+  --surface: rgba(255,255,255,0.03);
+  --surface-strong: rgba(255,255,255,0.06);
+  --muted:#9ca3af;
+  --text:#eef2ff;
+  --accent:#6c63ff;
+  --accent-2:#3ddc97;
+  --radius:12px;
+  --nav-h:72px;
+}
+
+/* -------------------------------
+   RESET
+-------------------------------- */
+*{ box-sizing:border-box; margin:0; padding:0 }
+html,body{ height:100% }
+
+body{
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto;
+  background:var(--bg);
+  color:var(--text);
+  line-height:1.45;
+  padding-top:var(--nav-h);
+  -webkit-font-smoothing:antialiased;
+}
+
+/* -------------------------------
+   NAVBAR
+-------------------------------- */
+.navbar,.dash-navbar{
+  position:fixed;
+  top:12px;
+  left:50%;
+  transform:translateX(-50%);
+  width:min(1180px,95%);
+  height:var(--nav-h);
+  background:var(--surface);
+  border:1px solid rgba(255,255,255,0.06);
+  border-radius:16px;
+  backdrop-filter: blur(8px);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 1.2rem;
+  z-index:1000;
+}
+
+.logo,.dash-logo{
+  font-weight:800;
+  font-size:1.2rem;
+  cursor:pointer;
+}
+
+/* -------------------------------
+   NAV MENU
+-------------------------------- */
+.nav-links,.dash-menu{
+  list-style:none;
+  display:flex;
+  gap:1rem;
+}
+
+.nav-links a,
+.dash-menu a{
+  color:var(--muted);
+  text-decoration:none;
+  font-weight:600;
+  padding:.45rem .7rem;
+  border-radius:10px;
+}
+
+.nav-links a:hover,
+.dash-menu a:hover,
+.dash-menu .active{
+  color:var(--text);
+  background:rgba(255,255,255,0.04);
+}
+
+/* -------------------------------
+   CONTAINERS
+-------------------------------- */
+.container,
+.dash-container{
+  width:min(1100px,95%);
+  margin:110px auto 60px auto;
+}
+
+/* -------------------------------
+   CARDS
+-------------------------------- */
+.section-card{
+  background:var(--surface);
+  border:1px solid rgba(255,255,255,0.06);
+  border-radius:var(--radius);
+  padding:1.5rem;
+  margin-bottom:1.5rem;
+}
+
+/* REMOVE STRAY LINES */
+.section-card > hr,
+.section-card::before,
+.section-card::after{
+  display:none;
+}
+
+/* -------------------------------
+   INPUTS
+-------------------------------- */
+.auth-input,
+select.auth-input,
+textarea{
+  width:100%;
+  padding:.85rem;
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,0.08);
+  background:rgba(255,255,255,0.04);
+  color:var(--text);
+  margin-bottom:1rem;
+  font-size:.95rem;
+}
+
+/* 🔑 TEXTAREA FIX */
+textarea{
+  min-height:180px;      /* FIX: larger writing space */
+  resize:vertical;
+  line-height:1.6;
+}
+
+/* -------------------------------
+   BUTTONS
+-------------------------------- */
+.auth-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:.55rem 1.2rem;
+  border-radius:10px;
+  font-weight:700;
+  font-size:.9rem;
+  border:1px solid rgba(255,255,255,0.08);
+  background:transparent;
+  color:var(--text);
+  cursor:pointer;
+  width:auto;
+}
+
+.auth-btn:hover{
+  background:rgba(255,255,255,0.06);
+}
+
+.auth-btn.primary{
+  background:var(--accent);
+  border:none;
+  color:white;
+}
+
+.auth-btn.primary:hover{
+  background:#574cff;
+}
+
+.auth-btn.small{
+  padding:.35rem .9rem;
+  font-size:.85rem;
+}
+
+/* -------------------------------
+   HELPERS
+-------------------------------- */
+.muted{ color:var(--muted) }
+.center{ text-align:center }
+.kv{ font-weight:700; color:var(--accent) }
+
+/* -------------------------------
+   FILE UPLOAD
+-------------------------------- */
+.file-upload{
+  display:flex;
+  align-items:center;
+  gap:.8rem;
+  margin-bottom:1rem;
+}
+
+.file-upload input{ display:none }
+
+.file-btn{
+  padding:.6rem 1rem;
+  border-radius:10px;
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.08);
+  font-weight:600;
+  cursor:pointer;
+}
+
+.file-btn:hover{
+  background:rgba(255,255,255,0.1);
+}
+
+/* -------------------------------
+   RESPONSIVE
+-------------------------------- */
+@media(max-width:860px){
+  .navbar,.dash-navbar{ height:64px; top:8px }
+  .container,.dash-container{ margin-top:95px }
+}

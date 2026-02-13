@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Applicant Dashboard — OPTIBIDS-RFP</title>
+
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+
+<body>
+
+<nav class="dash-navbar">
+  <div class="dash-logo">OPTIBIDS-RFP</div>
+
+  <ul class="dash-menu">
+    <li><a href="applicant_dashboard.html" class="active">Dashboard</a></li>
+    <li><a href="applicant_accepted.html">Accepted Offers</a></li>
+    <li><a onclick="applicant.showNotifications()" style="cursor:pointer;">Notifications</a></li>
+    <li><a onclick="auth.logout()" style="cursor:pointer;">Logout</a></li>
+  </ul>
+</nav>
+
+<main class="dash-container">
+    <section class="section-card" style="margin-top:2rem;">
+      <h2>Notifications</h2>
+      <div id="notifications" class="card-list">
+        <p class="muted">No offers yet.</p>
+      </div>
+    </section>
+
+
+  <!-- PUBLIC TENDERS LIST -->
+  <section class="section-card">
+    <h2>Available Tenders</h2>
+    <div id="public-tenders" class="card-list"></div>
+  </section>
+
+  <!-- APPLY FORM SECTION -->
+  <section id="apply-section" class="section-card" style="display:none; margin-top:2rem;">
+    <h2>Submit Application</h2>
+
+    <label class="muted">Tender ID</label>
+    <input id="apply-tender-id" class="auth-input" readonly />
+
+    <label class="muted">Your Description</label>
+    <textarea id="apply-text" class="auth-input" placeholder="Describe your proposal..."></textarea>
+
+    <button onclick="applicant.submitApplication()" class="auth-btn primary">
+      Submit Application
+    </button>
+
+    <p id="apply-msg" class="muted" style="margin-top:1rem;"></p>
+  </section>
+
+</main>
+
+<script src="../js/api.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/applicant.js"></script>
+
+<script>
+document.querySelectorAll(".dash-menu a").forEach(link => {
+  if (link.href === window.location.href) {
+    link.classList.add("active");
+  }
+});
+</script>
+
+</body>
+</html>
