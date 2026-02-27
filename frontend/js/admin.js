@@ -1,267 +1,205 @@
-// admin.js — FIXED & STABLE VERSION
+// admin.js — OPTIBOTS Premium Frontend (Rebuilt)
 
 const admin = {
 
-  /* =========================
-     CREATE TENDER
-  ========================= */
-  async createTender() {
-    const title = document.getElementById("t-title")?.value.trim();
-    const desc  = document.getElementById("t-desc")?.value.trim();
-    const file  = document.getElementById("t-file")?.files[0];
-
-    if (!title || !desc) {
-      alert("Title & description required");
-      return;
-    }
-
-    const form = new FormData();
-    form.append("title", title);
-    form.append("description", desc);
-    form.append("published", "true");
-    if (file) form.append("file", file);
-
+  /* =================================================
+     LOAD STATS (for dashboard counters)
+  ================================================= */
+  async loadStats() {
     try {
-      await api.upload("/admin/tenders", form);
-      alert("Tender published");
-      window.location.href = "/admin/admin_dashboard.html";
-    } catch (err) {
-      alert("Create failed");
-      console.error(err);
-    }
+      const [tenders, apps, accepted] = await Promise.all([
+        api.get('/admin/tenders'),
+        api.get('/admin/applications'),
+        api.get('/admin/accepted-offers'),
+      ]);
+
+      const el = id => document.getElementById(id);
+
+      if(el('stat-tenders'))  el('stat-tenders').textContent  = Array.isArray(tenders)  ? tenders.length  : '—';
+      if(el('stat-apps'))     el('stat-apps').textContent     = Array.isArray(apps)     ? apps.length     : '—';
+      if(el('stat-accepted')) el('stat-accepted').textContent = Array.isArray(accepted) ? accepted.length  : '—';
+      if(el('stat-pending')) {
+        const pending = Array.isArray(apps) ? apps.filter(a => a.status === 'submitted').length : 0;
+        el('stat-pending').textContent = pending;
+      }
+    } catch(e) { console.warn('Stats load failed', e); }
   },
 
-  /* =========================
+  /* =================================================
      LOAD TENDERS
-  ========================= */
+  ================================================= */
   async loadTenders() {
-    const box = document.getElementById("tenders-list");
+    const box = document.getElementById('tenders-list');
     if (!box) return;
 
-    box.innerHTML = "";
+    box.innerHTML = '<div class="loading-state"><div class="spinner"></div><p>Loading tenders…</p></div>';
 
     try {
-      const tenders = await api.get("/admin/tenders");
+      const tenders = await api.get('/admin/tenders');
 
-      if (!Array.isArray(tenders) || tenders.length === 0) {
-        box.innerHTML = "<p class='muted'>No tenders yet.</p>";
+      if (!Array.isArray(tenders) || !tenders.length) {
+        box.innerHTML = '<div class="empty-state"><i class="fas fa-file-contract"></i><p>No tenders yet. <a href="create_tender.html">Create your first tender</a>.</p></div>';
         return;
       }
 
+      box.innerHTML = '';
       tenders.forEach(t => {
-        const div = document.createElement("div");
-        div.className = "tender-item";
+        const div = document.createElement('div');
+        div.className = 'tender-item';
 
         const attachment = (t.files && t.files.length)
-          ? `<a class="auth-btn"
-               href="http://localhost:8000/download/${t.files[0]}"
-               target="_blank">Download Attachment</a>`
-          : `<span class="muted">No attachment</span>`;
+          ? `<a class="auth-btn small" href="http://localhost:8000/download/${t.files[0]}" target="_blank" style="margin-top:.5rem;"><i class="fas fa-download"></i> Download</a>`
+          : '';
 
         div.innerHTML = `
-          <h3>${t.title}</h3>
-          <p>${t.description}</p>
-
-          <p class="muted">Status: ${t.status}</p>
-          <p class="muted">Applications: ${t.applicant_count ?? 0}</p>
-
-          ${attachment}
-
-          <div style="margin-top:.5rem; display:flex; gap:.5rem;">
-            <button class="auth-btn"
-              onclick="admin.viewApplicants(${t.id})">
-              View Applicants
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:.5rem;margin-bottom:.5rem;">
+            <h3 style="margin:0;">${t.title}</h3>
+            <span class="badge ${t.status}">${t.status}</span>
+          </div>
+          <p style="font-size:0.875rem;">${t.description ? t.description.slice(0, 160) + (t.description.length > 160 ? '…' : '') : ''}</p>
+          <p style="font-size:0.8rem;color:var(--text-3);margin:.4rem 0;">
+            <i class="fas fa-users" style="margin-right:.3rem;"></i>${t.applicant_count ?? 0} application(s)
+          </p>
+          <div class="card-actions">
+            ${attachment}
+            <button class="auth-btn small" onclick="admin.viewApplicants(${t.id})">
+              <i class="fas fa-users"></i> View Applicants
             </button>
-
-            <button class="auth-btn primary"
-              onclick="admin.runSummary(${t.id})">
-              Read Summary
+            <button class="auth-btn small primary" onclick="admin.runSummary(${t.id})">
+              <i class="fas fa-robot"></i> AI Summary
             </button>
           </div>
+          <div id="summary-${t.id}" style="display:none;margin-top:1rem;"></div>
         `;
-
         box.appendChild(div);
       });
 
-    } catch (err) {
-      box.innerHTML = "<p class='error'>Failed to load tenders</p>";
-      console.error(err);
+    } catch(err) {
+      box.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Failed to load tenders.</p></div>';
     }
   },
 
-  /* =========================
+  /* =================================================
      RECENT APPLICATIONS
-  ========================= */
+  ================================================= */
   async loadRecentApps() {
-    const box = document.getElementById("recent-apps");
+    const box = document.getElementById('recent-apps');
     if (!box) return;
 
-    box.innerHTML = "";
+    box.innerHTML = '<div class="loading-state"><div class="spinner"></div><p>Loading…</p></div>';
 
     try {
-      const apps = await api.get("/admin/applications");
+      const apps = await api.get('/admin/applications');
 
-      if (!Array.isArray(apps) || apps.length === 0) {
-        box.innerHTML = "<p class='muted'>No applications yet.</p>";
+      if (!Array.isArray(apps) || !apps.length) {
+        box.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i><p>No applications yet.</p></div>';
         return;
       }
 
-      apps.slice(0, 5).forEach(a => {
-        const div = document.createElement("div");
+      box.innerHTML = '';
+      apps.slice(0, 8).forEach(a => {
+        const div = document.createElement('div');
         div.className = `tender-item status-${a.status}`;
-
         div.innerHTML = `
-          <b>${a.user_email}</b>
-          <p class="muted">Tender: ${a.tender_title}</p>
-          <p>Status: <b>${a.status}</b></p>
-
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem;">
+            <div>
+              <p style="font-weight:600;color:var(--text);font-size:0.92rem;">${a.user_email}</p>
+              <p style="font-size:0.82rem;color:var(--text-2);margin:.15rem 0;">${a.tender_title}</p>
+            </div>
+            <span class="badge ${a.status}">${a.status}</span>
+          </div>
           <div class="card-actions">
             <button class="auth-btn small" onclick="admin.reviewApplication(${a.id})">
-              Review
+              <i class="fas fa-eye"></i> Review
             </button>
           </div>
         `;
-
         box.appendChild(div);
       });
 
-    } catch (err) {
-      box.innerHTML = "<p class='error'>Failed to load applications</p>";
-      console.error(err);
+    } catch(err) {
+      box.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Failed to load applications.</p></div>';
     }
   },
 
-  /* =========================
-     REVIEW APPLICATION (FIXED)
-  ========================= */
+  /* =================================================
+     REVIEW APPLICATION
+  ================================================= */
   reviewApplication(appId) {
-    localStorage.setItem("review_app_id", appId);
-
-    // 🔥 FIX: absolute path avoids nginx 404
-    window.location.href = "/admin/review_application.html";
+    localStorage.setItem('review_app_id', appId);
+    window.location.href = '/admin/review_application.html';
   },
 
-  async loadApplicationForReview() {
-  const appId = localStorage.getItem("review_app_id");
-  if (!appId) {
-    alert("No application selected");
-    return;
-  }
+  viewApplicants(tenderId) {
+    localStorage.setItem('view_tender_id', tenderId);
+    window.location.href = '/admin/view_tender.html';
+  },
 
-  try {
-    const app = await api.get(`/admin/applications/${appId}`);
+  /* =================================================
+     AI SUMMARY (inline on dashboard)
+  ================================================= */
+  async runSummary(tenderId) {
+    const panel = document.getElementById(`summary-${tenderId}`);
+    if (!panel) return;
 
-    document.getElementById("app-text").innerHTML = `
-Applicant: ${app.user_email}
-Tender: ${app.tender_title}
-Status: ${app.status}
-
-------------------------------------
-
-${app.applicant_text}
-    `;
-  } catch (e) {
-    document.getElementById("app-text").innerText =
-      "Failed to load application.";
-    console.error(e);
-  }
-},
-
-  async sendOffer() {
-    const appId = localStorage.getItem("review_app_id");
-    const text = document.getElementById("offer-text")?.value.trim();
-
-    if (!appId || !text) {
-      alert("Offer text required");
-      return;
-    }
+    panel.style.display = 'block';
+    panel.innerHTML = `
+      <div class="ai-panel">
+        <div class="ai-panel-header">
+          <div class="ai-icon"><i class="fas fa-robot"></i></div>
+          <div><h3>Running AI Evaluation…</h3><p style="font-size:0.78rem;color:var(--text-3);margin:0;">This may take 10–30 seconds</p></div>
+        </div>
+        <div class="loading-state" style="padding:1.5rem 0;"><div class="spinner"></div></div>
+      </div>`;
 
     try {
-      await api.post(`/admin/applications/${appId}/offer`, {
-        message: text
-      });
+      const res = await api.post(`/admin/tenders/${tenderId}/summary`, {});
 
-      alert("Offer sent");
-      window.location.href = "/admin/admin_dashboard.html";
-    } catch (err) {
-      alert("Failed to send offer");
-      console.error(err);
+      if (res.error) {
+        panel.innerHTML = `<div class="ai-panel"><p style="color:var(--text-2);">${res.error}</p></div>`;
+        return;
+      }
+
+      const best = res.best_application || {};
+      const others = res.comparison || [];
+
+      panel.innerHTML = `
+        <div class="ai-panel">
+          <div class="ai-panel-header">
+            <div class="ai-icon"><i class="fas fa-robot"></i></div>
+            <div><h3>AI Evaluation Report</h3><p style="font-size:0.78rem;color:var(--text-3);margin:0;">Powered by phi3:mini</p></div>
+          </div>
+          <div class="best-applicant-card">
+            <h4><i class="fas fa-trophy"></i> Best Applicant</h4>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;font-size:0.88rem;">
+              <div><span style="color:var(--text-3);font-size:0.76rem;display:block;">EMAIL</span><strong>${best.email || '—'}</strong></div>
+              <div><span style="color:var(--text-3);font-size:0.76rem;display:block;">PRICE</span><strong>${best.price || '—'}</strong></div>
+              <div><span style="color:var(--text-3);font-size:0.76rem;display:block;">SKU</span><strong>${best.sku || '—'}</strong></div>
+              <div><span style="color:var(--text-3);font-size:0.76rem;display:block;">VERDICT</span><strong style="color:var(--accent-green);">${best.verdict || '—'}</strong></div>
+            </div>
+            ${best.brief ? `<p style="margin-top:.75rem;font-size:0.85rem;color:var(--text-2);">${best.brief}</p>` : ''}
+          </div>
+          ${others.length ? `
+            <h4 style="font-size:0.9rem;margin-bottom:.6rem;color:var(--text-2);">All Applicants</h4>
+            <div style="overflow-x:auto;">
+              <table class="comparison-table">
+                <thead><tr><th>Email</th><th>Price</th><th>Strengths</th><th>Weaknesses</th></tr></thead>
+                <tbody>${others.map(a => `
+                  <tr>
+                    <td>${a.email}</td>
+                    <td>${a.price}</td>
+                    <td style="color:var(--accent-green);">${(Array.isArray(a.strengths) ? a.strengths : [a.strengths || '—']).join(', ')}</td>
+                    <td style="color:var(--accent-red);">${(Array.isArray(a.weaknesses) ? a.weaknesses : [a.weaknesses || '—']).join(', ')}</td>
+                  </tr>`).join('')}
+                </tbody>
+              </table>
+            </div>` : ''}
+        </div>`;
+
+    } catch(err) {
+      panel.innerHTML = `<div class="ai-panel"><p style="color:var(--accent-red);"><i class="fas fa-exclamation-circle"></i> AI evaluation failed. Ensure Ollama is running.</p></div>`;
     }
   },
-
-  /* =========================
-     AI SUMMARY
-  ========================= */
-async runSummary(tenderId) {
-  let section = document.getElementById("summary-section");
-
-  // Create section only once
-  if (!section) {
-    section = document.createElement("section");
-    section.id = "summary-section";
-    section.className = "section-card";
-    section.style.marginTop = "2rem";
-    section.style.display = "none";
-
-    document.querySelector(".dash-container").appendChild(section);
-  }
-
-  section.style.display = "block";
-  section.innerHTML = "<p class='muted'>Running AI evaluation…</p>";
-
-  try {
-    const res = await api.post(`/admin/tenders/${tenderId}/summary`, {});
-
-    if (res.error) {
-      section.innerHTML = `<p class="muted">${res.error}</p>`;
-      return;
-    }
-
-    const best = res.best_application;
-
-    section.innerHTML = `
-      <h3>🏆 Best Application</h3>
-
-      <p><b>Email:</b> ${best.email}</p>
-      <p><b>Price:</b> ${best.price}</p>
-      <p><b>SKU:</b> ${best.sku}</p>
-      <p><b>Verdict:</b> ${best.verdict}</p>
-      <p>${best.brief}</p>
-
-      <hr />
-
-      <h4>All Applications</h4>
-      ${res.comparison.map(a => `
-        <div class="tender-item">
-          <p><b>${a.email}</b></p>
-          <p><b>Price:</b> ${a.price}</p>
-          <p><b>Strengths:</b> ${a.strengths.join(", ")}</p>
-          <p><b>Weaknesses:</b> ${a.weaknesses.join(", ")}</p>
-        </div>
-      `).join("")}
-    `;
-
-  } catch (err) {
-    section.innerHTML = "<p class='error'>Summary failed</p>";
-    console.error(err);
-  }
-},
-  viewApplicants(tenderId) {
-    localStorage.setItem("view_tender_id", tenderId);
-    window.location.href = "/admin/review_application.html";
-  }
 };
-
-
-/* =========================
-   AUTO LOAD (ADMIN DASHBOARD)
-========================= */
-if (location.pathname.includes("admin_dashboard.html")) {
-  (async () => {
-    await api.get("/auth/me");
-    admin.loadTenders();
-    admin.loadRecentApps();
-  })();
-}
 
 window.admin = admin;

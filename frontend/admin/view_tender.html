@@ -1,65 +1,121 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Tender Details</title>
-  <link rel="stylesheet" href="../css/styles.css">
-  <link rel="stylesheet" href="../css/dashboard.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>View Tender — OPTIBOTS Admin</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
 </head>
 <body>
 
-<nav class="dash-navbar">
-  <div class="dash-logo">OPTIBIDS-RFP</div>
-  <ul class="dash-menu">
-    <li><a href="admin_dashboard.html">Dashboard</a></li>
-    <li><a onclick="auth.logout()">Logout</a></li>
-  </ul>
-</nav>
+<div class="dash-layout">
+  <aside class="dash-sidebar">
+    <div class="dash-sidebar-logo">OPTIBOTS</div>
+    <ul class="dash-nav">
+      <li><a href="admin_dashboard.html"><span class="nav-icon"><i class="fas fa-tachometer-alt"></i></span>Dashboard</a></li>
+      <li><a href="create_tender.html"><span class="nav-icon"><i class="fas fa-plus-circle"></i></span>Create Tender</a></li>
+      <li><a href="admin_accepted.html"><span class="nav-icon"><i class="fas fa-handshake"></i></span>Accepted Offers</a></li>
+      <div class="nav-separator"></div>
+      <li class="logout"><button onclick="doLogout()"><span class="nav-icon"><i class="fas fa-sign-out-alt"></i></span>Logout</button></li>
+    </ul>
+  </aside>
 
-<main class="dash-container">
+  <main class="dash-main">
+    <div class="dash-header">
+      <div style="display:flex;align-items:center;gap:1rem;">
+        <a href="admin_dashboard.html" class="btn-icon"><i class="fas fa-arrow-left"></i></a>
+        <div>
+          <h1>Tender Applications</h1>
+          <p>All vendor applications for this tender.</p>
+        </div>
+      </div>
+    </div>
 
-  <section class="section-card">
-    <h2 id="title"></h2>
-    <p id="description" class="muted"></p>
+    <div class="section-card">
+      <div class="section-card-header">
+        <h2><i class="fas fa-users"></i> <span id="tender-title">Tender</span></h2>
+        <span class="badge public">Public</span>
+      </div>
+      <div id="apps-list" class="card-list">
+        <div class="loading-state"><div class="spinner"></div><p>Loading applications…</p></div>
+      </div>
+    </div>
+  </main>
+</div>
 
-    <div id="file-box" style="margin:1rem 0;"></div>
-
-    <h3>Applications</h3>
-    <div id="apps-box" class="card-list"></div>
-  </section>
-
-</main>
-
+<div id="toast-container"></div>
 
 <script src="../js/api.js"></script>
-<script src="../js/auth.js"></script>
+<script src="../js/utils.js"></script>
 <script>
-const tenderId = parseInt(localStorage.getItem("view_tender_id"));
+function doLogout() { localStorage.removeItem('token'); window.location.href = '/login.html'; }
 
-(async () => {
-  const tenders = await api.get("/admin/tenders");
-  const t = tenders.find(x => x.id === tenderId);
+async function loadTenderApps() {
+  const tenderId = localStorage.getItem('view_tender_id');
+  const box = document.getElementById('apps-list');
 
-  document.getElementById("title").innerText = t.title;
-  document.getElementById("description").innerText = t.description;
-
-  if (t.filename) {
-    document.getElementById("file-box").innerHTML =
-      `<a class="auth-btn" href="http://localhost:8000/download/${t.filename}">Download attachment</a>`;
+  if (!tenderId) {
+    box.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i><p>No tender selected. <a href="admin_dashboard.html">Go back</a>.</p></div>';
+    return;
   }
 
-  const apps = await api.get("/admin/applications");
-  const related = apps.filter(a => a.tender_id === tenderId);
+  box.innerHTML = '<div class="loading-state"><div class="spinner"></div><p>Loading applications…</p></div>';
 
-  const box = document.getElementById("apps-box");
-  related.forEach(a => {
-    box.innerHTML += `
-      <div class="tender-item">
-        <b>${a.user_email}</b><br>
-        ${a.text}<br><br>
-        <button class="auth-btn" onclick="location.href='review_application.html'">Open</button>
-      </div>
-    `;
-  });
+  try {
+    // Fetch both in parallel
+    const [apps, tenders] = await Promise.all([
+      api.get('/admin/applications'),
+      api.get('/admin/tenders'),
+    ]);
+
+    // Set tender title in header
+    const tender = tenders.find(t => String(t.id) === String(tenderId));
+    if (tender) document.getElementById('tender-title').textContent = tender.title;
+
+    // Filter by tender_id (now included in backend response)
+    const relevant = apps.filter(a => String(a.tender_id) === String(tenderId));
+
+    if (!relevant.length) {
+      box.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i><p>No applications submitted for this tender yet.</p></div>';
+      return;
+    }
+
+    box.innerHTML = '';
+    relevant.forEach(a => {
+      const div = document.createElement('div');
+      div.className = `tender-item status-${a.status}`;
+      div.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem;margin-bottom:.5rem;">
+          <strong>${a.user_email}</strong>
+          <span class="badge ${a.status}">${a.status}</span>
+        </div>
+        <div class="card-actions">
+          <button class="auth-btn small" onclick="reviewApp(${a.id})">
+            <i class="fas fa-eye"></i> Review Application
+          </button>
+        </div>
+      `;
+      box.appendChild(div);
+    });
+  } catch (err) {
+    console.error(err);
+    box.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>Failed to load applications.</p></div>';
+  }
+}
+
+function reviewApp(id) {
+  localStorage.setItem('review_app_id', id);
+  window.location.href = '/admin/review_application.html';
+}
+
+(async () => {
+  try {
+    const user = await api.get('/auth/me');
+    if (!user || user.role !== 'admin') { window.location.href = '/login.html'; return; }
+    loadTenderApps();
+  } catch { window.location.href = '/login.html'; }
 })();
 </script>
 

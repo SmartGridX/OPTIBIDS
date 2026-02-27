@@ -1,63 +1,91 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Accepted Offers — OPTIBIDS</title>
-  <link rel="stylesheet" href="../css/styles.css">
-  <link rel="stylesheet" href="../css/dashboard.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>My Contracts — OPTIBOTS</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
 </head>
-
 <body>
 
-<nav class="dash-navbar">
-  <div class="dash-logo">OPTIBIDS-RFP</div>
- <ul class="dash-menu">
-  <li><a href="applicant_dashboard.html" class="active">Dashboard</a></li>
-  <li><a href="applicant_accepted.html">Accepted Offers</a></li>
-  <li><a onclick="applicant.showNotifications()" style="cursor:pointer;">Notifications</a></li>
-  <li><a onclick="auth.logout()" style="cursor:pointer;">Logout</a></li>
-</ul>
-</nav>
+<div class="dash-layout">
+  <aside class="dash-sidebar">
+    <div class="dash-sidebar-logo">OPTIBOTS</div>
+    <ul class="dash-nav">
+      <li><a href="applicant_dashboard.html"><span class="nav-icon"><i class="fas fa-th-large"></i></span>Dashboard</a></li>
+      <li><a href="applicant_accepted.html" class="active"><span class="nav-icon"><i class="fas fa-file-signature"></i></span>My Contracts</a></li>
+      <div class="nav-separator"></div>
+      <li class="logout"><button onclick="doLogout()"><span class="nav-icon"><i class="fas fa-sign-out-alt"></i></span>Logout</button></li>
+    </ul>
+  </aside>
 
-<div class="dash-container">
-  <div class="section-card">
-    <h2>Accepted Offers</h2>
-    <div id="accepted-box" class="card-list"></div>
-  </div>
+  <main class="dash-main">
+    <div class="dash-header">
+      <h1>My Contracts</h1>
+      <p>Proposals you have accepted. These are your confirmed engagements.</p>
+    </div>
+
+    <div class="section-card">
+      <div class="section-card-header">
+        <h2><i class="fas fa-file-signature"></i> Accepted Contracts</h2>
+        <button class="btn-icon" onclick="loadAccepted()" title="Refresh"><i class="fas fa-sync-alt"></i></button>
+      </div>
+      <div id="accepted-list" class="card-list">
+        <div class="loading-state"><div class="spinner"></div><p>Loading contracts…</p></div>
+      </div>
+    </div>
+  </main>
 </div>
 
+<div id="toast-container"></div>
+
 <script src="../js/api.js"></script>
-<script src="../js/auth.js"></script>
+<script src="../js/utils.js"></script>
 <script>
+function doLogout() { localStorage.removeItem('token'); window.location.href = '/login.html'; }
+
 async function loadAccepted() {
-  const box = document.getElementById("accepted-box");
-
+  const box = document.getElementById('accepted-list');
+  box.innerHTML = '<div class="loading-state"><div class="spinner"></div><p>Loading…</p></div>';
   try {
-    const data = await api.get("/applicant/accepted");
-
-    if (!data.length) {
-      box.innerHTML = "<p class='muted'>No accepted offers yet.</p>";
+    const rows = await api.get('/applicant/accepted');
+    if (!rows.length) {
+      box.innerHTML = '<div class="empty-state"><i class="fas fa-file-signature"></i><p>No accepted contracts yet. Keep applying!</p></div>';
       return;
     }
-
-    box.innerHTML = "";
-    data.forEach(o => {
-      const div = document.createElement("div");
-      div.className = "item status-accepted";
+    box.innerHTML = '';
+    rows.forEach(r => {
+      const div = document.createElement('div');
+      div.className = 'tender-item status-accepted';
       div.innerHTML = `
-        <h3>${o.tender_title}</h3>
-        <p>${o.offer?.message || ""}</p>
-        <p class="kv">Status: Accepted</p>
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem;margin-bottom:.75rem;">
+          <h3 style="margin:0;">${r.tender_title}</h3>
+          <span class="badge accepted">Accepted</span>
+        </div>
+        ${r.offer && r.offer.message ? `
+          <div style="background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.2);border-radius:var(--radius-sm);padding:1rem;margin-top:.5rem;">
+            <span style="font-size:0.75rem;text-transform:uppercase;letter-spacing:.5px;color:var(--accent-green);display:flex;align-items:center;gap:.3rem;margin-bottom:.3rem;"><i class="fas fa-file-contract"></i>Contract Terms</span>
+            <p style="font-size:0.88rem;color:var(--text-2);">${r.offer.message}</p>
+          </div>
+        ` : ''}
+        <p style="font-size:0.78rem;color:var(--text-3);margin-top:.5rem;">Application #${r.application_id}</p>
       `;
       box.appendChild(div);
     });
-
-  } catch (e) {
-    box.innerHTML = "<p class='muted'>Failed to load accepted offers.</p>";
+  } catch {
+    box.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>Failed to load contracts.</p></div>';
   }
 }
 
-loadAccepted();
+(async () => {
+  try {
+    const user = await api.get('/auth/me');
+    if (!user || user.role !== 'applicant') { window.location.href = '/login.html'; return; }
+    loadAccepted();
+  } catch { window.location.href = '/login.html'; }
+})();
 </script>
 
 </body>

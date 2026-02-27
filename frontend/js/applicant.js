@@ -1,123 +1,162 @@
-// applicant.js
+// applicant.js — OPTIBOTS Premium Frontend (Rebuilt)
+
 const applicant = {
 
-  /* =========================
+  /* =================================================
      LOAD PUBLIC TENDERS
-  ========================= */
+  ================================================= */
   async loadTenders() {
-    try {
-      const tenders = await api.get("/tenders");
-      const box = document.getElementById("public-tenders");
+    const box = document.getElementById('public-tenders');
+    if (!box) return;
 
-      box.innerHTML = "";
+    box.innerHTML = '<div class="loading-state"><div class="spinner"></div><p>Loading tenders…</p></div>';
+
+    try {
+      const tenders = await api.get('/tenders');
 
       if (!Array.isArray(tenders) || !tenders.length) {
-        box.innerHTML = "<p class='muted'>No public tenders available.</p>";
+        box.innerHTML = '<div class="empty-state"><i class="fas fa-file-contract"></i><p>No public tenders available right now.</p></div>';
         return;
       }
 
+      box.innerHTML = '';
       tenders.forEach(t => {
-        const div = document.createElement("div");
-        div.className = "tender-item";
+        const div = document.createElement('div');
+        div.className = 'tender-item';
+        // Store title safely as a data attribute to avoid quote escaping in onclick
+        div.dataset.tenderTitle = t.title;
 
         div.innerHTML = `
-          <h3>${t.title}</h3>
-          <p>${t.description}</p>
-
-          <button class="auth-btn primary"
-            onclick="applicant.openApplyForm(${t.id})">
-            Apply
-          </button>
-        `;
-
-        box.appendChild(div);
-      });
-
-    } catch (e) {
-      console.error("Failed to load tenders", e);
-    }
-  },
-
-  /* =========================
-     APPLY FORM
-  ========================= */
-  openApplyForm(tenderId) {
-    document.getElementById("apply-tender-id").value = tenderId;
-    document.getElementById("apply-section").style.display = "block";
-  },
-
-  async submitApplication() {
-    const tenderId = Number(document.getElementById("apply-tender-id").value);
-    const text = document.getElementById("apply-text").value.trim();
-
-    if (!text) return alert("Application text required");
-
-    const res = await api.post("/applicant/submit_application", {
-      tender_id: tenderId,
-      text
-    });
-
-    document.getElementById("apply-msg").innerText =
-      "Application submitted (ID " + res.application_id + ")";
-  },
-
-  /* =========================
-     NOTIFICATIONS (OFFERS)
-  ========================= */
-  async loadNotifications() {
-    try {
-      const offers = await api.get("/applicant/notifications");
-      const box = document.getElementById("notifications");
-
-      box.innerHTML = "";
-
-      if (!offers.length) {
-        box.innerHTML = "<p class='muted'>No offers yet.</p>";
-        return;
-      }
-
-      offers.forEach(o => {
-        const div = document.createElement("div");
-        div.className = "tender-item";
-
-        div.innerHTML = `
-          <p><b>Offer for Tender #${o.tender_id}</b></p>
-          <p>${o.offer?.message || "No details provided"}</p>
-
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:.5rem;margin-bottom:.5rem;">
+            <h3 style="margin:0;font-size:1rem;">${t.title}</h3>
+            <span class="badge public">Open</span>
+          </div>
+          <p style="font-size:0.875rem;">${t.description ? t.description.slice(0, 200) + (t.description.length > 200 ? '…' : '') : ''}</p>
           <div class="card-actions">
             <button class="auth-btn small primary"
-              onclick="applicant.respondOffer(${o.application_id}, 'accept')">
-              Accept
-            </button>
-
-            <button class="auth-btn small"
-              onclick="applicant.respondOffer(${o.application_id}, 'reject')">
-              Reject
+              data-tender-id="${t.id}"
+              data-tender-title="${t.title.replace(/"/g, '&quot;')}"
+              onclick="applicant.openApplyForm(this)">
+              <i class="fas fa-paper-plane"></i> Apply Now
             </button>
           </div>
         `;
-
         box.appendChild(div);
       });
 
-    } catch (e) {
-      console.error("Notification load failed", e);
+    } catch(e) {
+      box.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Failed to load tenders.</p></div>';
     }
   },
 
+  /* =================================================
+     OPEN APPLY MODAL (called from Apply Now button)
+  ================================================= */
+  openApplyForm(btn) {
+    const tenderId    = btn.dataset.tenderId;
+    const tenderTitle = btn.dataset.tenderTitle;
+
+    // Fill the hidden fields that submitProposal() reads
+    const idEl = document.getElementById('apply-tender-id');
+    const nameEl = document.getElementById('tender-name-display');
+    const textEl = document.getElementById('apply-text');
+    const msgEl  = document.getElementById('apply-msg');
+    const modal  = document.getElementById('apply-modal');
+
+    if (!idEl || !modal) {
+      console.error('Modal elements missing');
+      return;
+    }
+
+    idEl.value = tenderId;
+    if (nameEl)  nameEl.textContent = '📋 ' + (tenderTitle || 'Tender #' + tenderId);
+    if (textEl)  textEl.value = '';
+    if (msgEl)   msgEl.textContent = '';
+
+    modal.classList.add('open');
+  },
+
+  /* =================================================
+     LOAD NOTIFICATIONS (OFFERS)
+  ================================================= */
+  async loadNotifications() {
+    const box = document.getElementById('notifications');
+    if (!box) return;
+
+    box.innerHTML = '<div class="loading-state"><div class="spinner"></div><p>Checking for offers…</p></div>';
+
+    try {
+      const offers = await api.get('/applicant/notifications');
+
+      if (!offers.length) {
+        box.innerHTML = '<div class="empty-state" style="padding:1.5rem;"><i class="fas fa-bell-slash"></i><p>No pending offers at this time.</p></div>';
+        return;
+      }
+
+      box.innerHTML = '';
+      offers.forEach(o => {
+        const div = document.createElement('div');
+        div.className = 'offer-card';
+        div.style.marginBottom = '1rem';
+
+        div.innerHTML = `
+          <h4><i class="fas fa-bell"></i> Offer for Tender #${o.tender_id}</h4>
+          <p style="margin:.6rem 0 .8rem;">${o.offer?.message || 'No offer details provided.'}</p>
+          <div class="card-actions">
+            <button class="auth-btn small primary"
+              onclick="applicant.respondOffer(${o.application_id}, 'accept')">
+              <i class="fas fa-check"></i> Accept
+            </button>
+            <button class="auth-btn small danger"
+              onclick="applicant.respondOffer(${o.application_id}, 'reject')">
+              <i class="fas fa-times"></i> Decline
+            </button>
+          </div>
+        `;
+        box.appendChild(div);
+      });
+
+    } catch(e) {
+      box.innerHTML = '<div class="empty-state" style="padding:1rem;"><p>Failed to load notifications.</p></div>';
+    }
+  },
+
+  /* =================================================
+     RESPOND TO OFFER
+  ================================================= */
   async respondOffer(appId, decision) {
-    await api.post(`/applicant/offer/${appId}/respond?decision=${decision}`);
-    alert(`Offer ${decision}ed`);
-    this.loadNotifications();
-  }
+    try {
+      await api.post(`/applicant/offer/${appId}/respond?decision=${decision}`);
+      const msg = decision === 'accept' ? '🎉 Offer accepted! Check My Contracts.' : 'Offer declined.';
+      showToastGlobal(msg, decision === 'accept' ? 'success' : 'info');
+      // Reload notifications
+      setTimeout(() => applicant.loadNotifications(), 600);
+
+      // Update badge
+      if (decision === 'accept') {
+        const badge = document.getElementById('notif-badge');
+        if (badge) {
+          const cur = parseInt(badge.textContent) || 0;
+          if (cur <= 1) badge.style.display = 'none';
+          else badge.textContent = cur - 1;
+        }
+      }
+    } catch(e) {
+      showToastGlobal('Failed to respond to offer', 'error');
+    }
+  },
 };
 
-/* =========================
-   AUTO LOAD
-========================= */
-if (location.pathname.includes("applicant_dashboard.html")) {
-  applicant.loadTenders();
-  applicant.loadNotifications();
+function showToastGlobal(msg, type='info') {
+  const container = document.getElementById('toast-container');
+  if (!container) return;
+  const icons = { success:'fa-check-circle', error:'fa-times-circle', info:'fa-info-circle' };
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `<i class="fas ${icons[type] || 'fa-info-circle'}"></i><span>${msg}</span>`;
+  container.appendChild(t);
+  setTimeout(() => t.remove(), 3500);
 }
 
 window.applicant = applicant;
+window.showToast = showToastGlobal;

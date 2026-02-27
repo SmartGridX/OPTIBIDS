@@ -3,80 +3,275 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>OPTIBIDS — Agentic RFP Automation</title>
-
-  <link rel="stylesheet" href="css/styles.css">
-  <link rel="stylesheet" href="css/dashboard.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <title>OPTIBOTS — AI-Powered RFP & Tender Platform</title>
+  <meta name="description" content="OPTIBOTS automates RFP evaluation, vendor proposal analysis, SKU matching, and offer negotiation using AI." />
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
 </head>
+<body>
 
-<body data-theme="dark">
+<!-- NAVBAR -->
+<nav class="navbar" id="main-nav">
+  <div class="logo" onclick="location.href='index.html'">OPTIBOTS</div>
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#workflow">Workflow</a></li>
+    <li><a href="#team">Team</a></li>
+    <li><a href="./login.html" class="btn" style="padding:.55rem 1.2rem; font-size:0.88rem;">Login</a></li>
+  </ul>
+</nav>
 
-  <!-- NAVBAR -->
-  <nav class="navbar">
-    <div class="logo" onclick="location.href='index.html'">OPTIBIDS-RFP</div>
-    <ul class="nav-links">
-      <li><a href="#features">Features</a></li>
-      <li><a href="#workflow">Workflow</a></li>
-      <li><a href="#team">Team</a></li>
-      <li><a href="/login.html" class="btn">Login</a></li>
-    </ul>
-  </nav>
+<!-- HERO -->
+<header id="hero" class="hero">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
 
-  <!-- HERO -->
-  <main class="container">
-    <section class="hero" id="hero">
-      <div>
-        <h1>Agentic AI for RFP Automation — Faster, Smarter, Scalable</h1>
-        <p class="lead">
-          Monitor RFPs, extract requirements using LLMs, match SKUs and produce AI-assisted proposals
-          — all inside one streamlined pipeline.
-        </p>
+  <div style="position:relative;z-index:1;">
+    <div class="hero-badge">
+      <i class="fas fa-robot"></i> AI-Powered Procurement Platform
+    </div>
 
-        <div style="display:flex; gap:1rem; justify-content:center;">
-          <a class="btn" href="/signup.html">Get started</a>
-          <a class="btn alt" href="#features">Learn more</a>
+    <h1>
+      Automate RFPs with<br><span class="gradient-text">Agentic AI Intelligence</span>
+    </h1>
+
+    <p class="lead">
+      Monitor tenders, extract requirements using LLMs, match SKUs semantically,
+      compute pricing dynamically, and generate AI-assisted proposals — all in one unified platform.
+    </p>
+
+    <div class="hero-ctas">
+      <a class="btn" href="./signup.html">
+        <i class="fas fa-rocket"></i> Get Started Free
+      </a>
+      <a class="btn alt" href="#features" style="color:var(--text);">
+        <i class="fas fa-play-circle"></i> Learn More
+      </a>
+    </div>
+  </div>
+</header>
+
+<!-- FEATURES -->
+<section id="features" class="section reveal">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">Key Features</div>
+      <h2>Everything you need to win tenders</h2>
+      <p>From RFP creation to offer acceptance — powered by AI at every step.</p>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fas fa-file-contract"></i></div>
+        <h3>Tender Publishing</h3>
+        <p>Create and publish procurement tenders instantly with document attachments and public visibility controls.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fas fa-brain"></i></div>
+        <h3>LLM Requirement Extraction</h3>
+        <p>Automatically extract structured requirements from tender documents using powerful language models.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fas fa-layer-group"></i></div>
+        <h3>Intelligent SKU Matching</h3>
+        <p>Vector-based semantic search maps RFP requirements to your inventory catalog with precision.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fas fa-calculator"></i></div>
+        <h3>Dynamic Pricing Engine</h3>
+        <p>Rule-driven engine computes competitive pricing automatically based on matched SKUs and market signals.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fas fa-chart-bar"></i></div>
+        <h3>AI Proposal Analysis</h3>
+        <p>Get instant AI-generated summaries comparing all vendor proposals with strengths, weaknesses, and best-pick recommendations.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fas fa-handshake"></i></div>
+        <h3>Offer & Contract Tracking</h3>
+        <p>Send, receive, accept or reject offers in real time. Track every accepted contract in one place.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WORKFLOW TIMELINE -->
+<section id="workflow" class="section reveal">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">AI Pipeline</div>
+      <h2>How It Works</h2>
+      <p>Six intelligent steps take your RFP from raw text to evaluated, priced proposal in minutes.</p>
+    </div>
+
+    <div class="timeline">
+
+      <div class="timeline-item">
+        <div class="timeline-content">
+          <h3><i class="fas fa-search" style="color:var(--primary-light);margin-right:.4rem;"></i> Monitor & Ingest Tenders</h3>
+          <p>Admin publishes tenders with full descriptions and supporting documents. Applicants are notified of available opportunities.</p>
+        </div>
+        <div class="timeline-dot">1</div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-dot">2</div>
+        <div class="timeline-content">
+          <h3><i class="fas fa-file-alt" style="color:var(--primary-light);margin-right:.4rem;"></i> Extract Requirements</h3>
+          <p>The AI agent uses phi3:mini LLM to extract structured requirements from the tender's raw text description.</p>
         </div>
       </div>
-    </section>
 
-    <!-- FEATURES -->
-    <section id="features" style="margin-top:3rem;">
-      <h2 class="center">Key Features</h2>
-
-      <div class="features-grid">
-        <div class="feature-card"><h3>Automated Monitoring</h3><p>Fetch RFPs via webhook or API.</p></div>
-        <div class="feature-card"><h3>LLM Extraction</h3><p>Convert documents into structured requirements.</p></div>
-        <div class="feature-card"><h3>SKU Matching</h3><p>Vector matching and rule-based filters.</p></div>
-        <div class="feature-card"><h3>Proposal Output</h3><p>Generate clean DOCX/PDF proposals.</p></div>
+      <div class="timeline-item">
+        <div class="timeline-content">
+          <h3><i class="fas fa-vector-square" style="color:var(--primary-light);margin-right:.4rem;"></i> Match SKUs</h3>
+          <p>FAISS vector embeddings semantically match extracted requirements to inventory SKUs with high accuracy.</p>
+        </div>
+        <div class="timeline-dot">3</div>
       </div>
-    </section>
 
-    <!-- WORKFLOW -->
-    <section id="workflow" style="margin-top:3rem;">
-      <h2 class="center">Workflow Overview</h2>
-
-      <div class="features-grid">
-        <div class="feature-card"><strong>1.</strong> Detect & Ingest RFP</div>
-        <div class="feature-card"><strong>2.</strong> Extract Requirements</div>
-        <div class="feature-card"><strong>3.</strong> Match SKUs & Pricing</div>
-        <div class="feature-card"><strong>4.</strong> Consolidate Proposal</div>
+      <div class="timeline-item">
+        <div class="timeline-dot">4</div>
+        <div class="timeline-content">
+          <h3><i class="fas fa-tags" style="color:var(--primary-light);margin-right:.4rem;"></i> Compute Pricing</h3>
+          <p>A Python rules-based pricing engine dynamically calculates competitive offers per matched SKU.</p>
+        </div>
       </div>
-    </section>
 
-    <!-- TEAM -->
-    <section id="team" style="margin-top:3rem;">
-      <h2 class="center">Team</h2>
-      <p class="center muted">Hackathon-ready prototype built by your engineering team.</p>
-    </section>
+      <div class="timeline-item">
+        <div class="timeline-content">
+          <h3><i class="fas fa-stars" style="color:var(--primary-light);margin-right:.4rem;"></i> Evaluate & Compare</h3>
+          <p>AI consolidates all vendor proposals and produces a ranked comparison with the best applicant highlighted.</p>
+        </div>
+        <div class="timeline-dot">5</div>
+      </div>
 
-  </main>
+      <div class="timeline-item">
+        <div class="timeline-dot">6</div>
+        <div class="timeline-content">
+          <h3><i class="fas fa-check-circle" style="color:var(--primary-light);margin-right:.4rem;"></i> Offer & Accept</h3>
+          <p>Admin sends targeted offers. Vendors accept or reject. Accepted contracts are stored and accessible to both parties.</p>
+        </div>
+      </div>
 
-  <footer class="site-footer">
-    <div class="container">
-      <div class="center muted">© 2025 OPTIBIDS — Agentic RFP Automation</div>
     </div>
-  </footer>
+  </div>
+</section>
+
+<!-- TEAM -->
+<section id="team" class="section team-section reveal">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">The Team</div>
+      <h2>Built by OPTIBOTS</h2>
+      <p>Passionate engineers and designers pushing the boundaries of AI-powered procurement.</p>
+    </div>
+
+    <div class="developers-grid">
+
+      <div class="developer-card">
+        <div class="developer-image-wrapper">
+          <img src="assets/dev_img/avinash_r_img.jpg" alt="Avinash Rout" class="developer-img" onerror="this.src='data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 80 80\'><rect width=\'80\' height=\'80\' fill=\'%23111827\'/><text x=\'50%\' y=\'55%\' text-anchor=\'middle\' fill=\'%237c3aed\' font-size=\'28\' font-family=\'Inter\'>AR</text></svg>'">
+        </div>
+        <div class="developer-info">
+          <h3>Avinash Rout</h3>
+          <p>Backend Developer</p>
+        </div>
+        <div class="developer-overlay">
+          <h4>Tech Stack</h4>
+          <ul class="tech-stack">
+            <li>Python · FastAPI</li>
+            <li>Docker · Kubernetes</li>
+            <li>CI/CD Pipelines</li>
+            <li>SQLModel · FAISS</li>
+          </ul>
+          <div class="social-links">
+            <a href="https://github.com/Avinash24R" target="_blank"><i class="fab fa-github"></i></a>
+            <a href="https://www.linkedin.com/in/avinash-at-work/" target="_blank"><i class="fab fa-linkedin"></i></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="developer-card">
+        <div class="developer-image-wrapper">
+          <img src="assets/dev_img/ir_img2.png" alt="Ishaan Ray" class="developer-img" onerror="this.src='data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 80 80\'><rect width=\'80\' height=\'80\' fill=\'%23111827\'/><text x=\'50%\' y=\'55%\' text-anchor=\'middle\' fill=\'%2338bdf8\' font-size=\'28\' font-family=\'Inter\'>IR</text></svg>'">
+        </div>
+        <div class="developer-info">
+          <h3>Ishaan Ray</h3>
+          <p>Frontend Developer</p>
+        </div>
+        <div class="developer-overlay">
+          <h4>Tech Stack</h4>
+          <ul class="tech-stack">
+            <li>HTML · CSS · JavaScript</li>
+            <li>React · UI/UX Design</li>
+            <li>Three.js · GSAP</li>
+          </ul>
+          <div class="social-links">
+            <a href="https://github.com/Cipher-Shadow-IR" target="_blank"><i class="fab fa-github"></i></a>
+            <a href="https://www.linkedin.com/in/ishaan-ray-cs" target="_blank"><i class="fab fa-linkedin"></i></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="developer-card">
+        <div class="developer-image-wrapper">
+          <img src="assets/dev_img/neno_img.jpg" alt="Nilanchal Pradhan" class="developer-img" onerror="this.src='data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 80 80\'><rect width=\'80\' height=\'80\' fill=\'%23111827\'/><text x=\'50%\' y=\'55%\' text-anchor=\'middle\' fill=\'%2334d399\' font-size=\'28\' font-family=\'Inter\'>NP</text></svg>'">
+        </div>
+        <div class="developer-info">
+          <h3>Nilanchal Pradhan</h3>
+          <p>Documentation & UX</p>
+        </div>
+        <div class="developer-overlay">
+          <h4>Tech Stack</h4>
+          <ul class="tech-stack">
+            <li>Technical Writing</li>
+            <li>UI/UX Research</li>
+            <li>Product Documentation</li>
+          </ul>
+          <div class="social-links">
+            <a href="https://www.linkedin.com/in/nilanchal-pradhan-a31804278/" target="_blank"><i class="fab fa-linkedin"></i></a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="container">
+    <a href="#" class="footer-logo">OPTIBOTS</a>
+    <p>AI-Powered RFP & Tender Evaluation Platform</p>
+    <div class="footer-socials">
+      <a href="https://github.com/SmartGridX/OPTIBOTS" target="_blank">
+        <i class="fab fa-github"></i>
+      </a>
+    </div>
+    <p style="font-size:0.82rem;margin-top:.5rem;">© 2025 OPTIBOTS Team — EY Techathon 6.0</p>
+  </div>
+</footer>
+
+<div id="toast-container"></div>
+
+<script>
+  // Navbar scroll effect
+  const nav = document.getElementById('main-nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 50);
+  });
+
+  // Reveal on scroll
+  const reveals = document.querySelectorAll('.reveal');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => obs.observe(el));
+</script>
 
 </body>
 </html>

@@ -3,37 +3,140 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Login — OPTIBIDS</title>
-
-  <link rel="stylesheet" href="css/styles.css">
-  <link rel="stylesheet" href="css/dashboard.css">
+  <title>Login — OPTIBOTS</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
 </head>
+<body>
 
-<body data-theme="dark">
+<div class="auth-bg">
+  <!-- Background blobs -->
+  <div class="blob blob-1" style="opacity:0.12;"></div>
+  <div class="blob blob-2" style="opacity:0.10;"></div>
 
-  <nav class="dash-navbar">
-    <div class="dash-logo" onclick="location.href='index.html'">OPTIBIDS-RFP</div>
-    <ul class="dash-menu">
-      <li><a href="signup.html">Sign up</a></li>
-    </ul>
-  </nav>
-
-  <main class="auth-container">
-    <div class="auth-card">
-      <h2>Welcome Back</h2>
-      <p class="muted">Login to continue</p>
-
-      <input id="email" class="auth-input" type="email" placeholder="Email">
-      <input id="password" class="auth-input" type="password" placeholder="Password">
-
-      <button class="auth-btn" onclick="auth.login()">Login</button>
-
-      <p class="muted center">New user? <a href="signup.html">Create account</a></p>
+  <div class="auth-card">
+    <div class="auth-logo">
+      <a href="index.html"><span>OPTIBOTS</span></a>
     </div>
-  </main>
 
-  <script src="js/api.js"></script>
-  <script src="js/auth.js"></script>
+    <h2>Welcome Back</h2>
+    <p class="lead">Sign in to your account to continue</p>
+
+    <div id="login-error" class="error-msg"></div>
+
+    <div class="form-group">
+      <label for="email"><i class="fas fa-envelope" style="margin-right:.4rem;"></i>Email</label>
+      <input id="email" class="auth-input" type="email" placeholder="you@company.com" autocomplete="email" />
+    </div>
+
+    <div class="form-group">
+      <label for="password"><i class="fas fa-lock" style="margin-right:.4rem;"></i>Password</label>
+      <div style="position:relative;">
+        <input id="password" class="auth-input" type="password" placeholder="Enter your password" autocomplete="current-password" />
+        <button type="button" id="toggle-pw" onclick="togglePassword()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-3);cursor:pointer;font-size:0.95rem;">
+          <i class="fas fa-eye"></i>
+        </button>
+      </div>
+    </div>
+
+    <button class="auth-btn primary" id="login-btn" onclick="doLogin()">
+      <i class="fas fa-sign-in-alt"></i> Sign In
+    </button>
+
+    <p class="auth-switch">
+      Don't have an account? <a href="./signup.html">Create one</a>
+    </p>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script src="./js/api.js"></script>
+<script src="./js/utils.js"></script>
+<script>
+
+function togglePassword() {
+  const pw = document.getElementById('password');
+  const icon = document.querySelector('#toggle-pw i');
+  if (pw.type === 'password') {
+    pw.type = 'text';
+    icon.className = 'fas fa-eye-slash';
+  } else {
+    pw.type = 'password';
+    icon.className = 'fas fa-eye';
+  }
+}
+
+async function doLogin() {
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+  const errEl = document.getElementById('login-error');
+  const btn = document.getElementById('login-btn');
+
+  errEl.classList.remove('show');
+
+  if (!email || !password) {
+    errEl.textContent = 'Email and password are required.';
+    errEl.classList.add('show');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in…';
+
+  try {
+    const data = await api.post('/auth/login', { email, password });
+
+    if (!data.access_token) throw new Error('Login failed');
+
+    localStorage.setItem('token', data.access_token);
+
+    const user = await api.get('/auth/me');
+    if (!user) throw new Error('Invalid token');
+
+    showToast('Login successful!', 'success');
+
+    setTimeout(() => {
+      if (user.role === 'admin') window.location.href = '/admin/admin_dashboard.html';
+      else window.location.href = '/applicant/applicant_dashboard.html';
+    }, 600);
+
+  } catch (e) {
+    localStorage.removeItem('token');
+    errEl.textContent = 'Invalid email or password. Please try again.';
+    errEl.classList.add('show');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In';
+  }
+}
+
+// Allow Enter key
+document.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+// Toast helper
+function showToast(msg, type='info') {
+  const icons = { success:'fa-check-circle', error:'fa-times-circle', info:'fa-info-circle' };
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `<i class="fas ${icons[type]}"></i><span>${msg}</span>`;
+  document.getElementById('toast-container').appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+}
+
+// Auto-redirect if already logged in
+(async () => {
+  const token = localStorage.getItem('token');
+  if (!token) return;
+  try {
+    const user = await api.get('/auth/me');
+    if (user && user.role) {
+      if (user.role === 'admin') location.href = '/admin/admin_dashboard.html';
+      else location.href = '/applicant/applicant_dashboard.html';
+    }
+  } catch { localStorage.removeItem('token'); }
+})();
+</script>
 
 </body>
 </html>

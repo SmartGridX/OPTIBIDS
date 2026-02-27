@@ -1,56 +1,93 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Accepted Offers — Admin</title>
-  <link rel="stylesheet" href="../css/styles.css">
-  <link rel="stylesheet" href="../css/dashboard.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Accepted Offers — OPTIBOTS Admin</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
 </head>
-
 <body>
 
-<nav class="dash-navbar">
-  <div class="dash-logo">OPTIBIDS-RFP</div>
-  <ul class="dash-menu">
-    <li><a href="admin_dashboard.html">Dashboard</a></li>
-    <li><a class="active">Accepted Offers</a></li>
-    <li><a onclick="auth.logout()">Logout</a></li>
-  </ul>
-</nav>
+<div class="dash-layout">
+  <aside class="dash-sidebar">
+    <div class="dash-sidebar-logo">OPTIBOTS</div>
+    <ul class="dash-nav">
+      <li><a href="admin_dashboard.html"><span class="nav-icon"><i class="fas fa-tachometer-alt"></i></span>Dashboard</a></li>
+      <li><a href="create_tender.html"><span class="nav-icon"><i class="fas fa-plus-circle"></i></span>Create Tender</a></li>
+      <li><a href="admin_accepted.html" class="active"><span class="nav-icon"><i class="fas fa-handshake"></i></span>Accepted Offers</a></li>
+      <div class="nav-separator"></div>
+      <li class="logout"><button onclick="doLogout()"><span class="nav-icon"><i class="fas fa-sign-out-alt"></i></span>Logout</button></li>
+    </ul>
+  </aside>
 
-<div class="dash-container">
-  <div class="section-card">
-    <h2>Accepted Offers</h2>
-    <div id="accepted-admin-box" class="card-list"></div>
-  </div>
+  <main class="dash-main">
+    <div class="dash-header">
+      <h1>Accepted Offers</h1>
+      <p>All vendor applications that have been accepted. These are finalized contracts.</p>
+    </div>
+
+    <div class="section-card">
+      <div class="section-card-header">
+        <h2><i class="fas fa-handshake"></i> Confirmed Contracts</h2>
+        <button class="btn-icon" onclick="loadAccepted()" title="Refresh"><i class="fas fa-sync-alt"></i></button>
+      </div>
+      <div id="accepted-list" class="card-list">
+        <div class="loading-state"><div class="spinner"></div><p>Loading…</p></div>
+      </div>
+    </div>
+  </main>
 </div>
 
+<div id="toast-container"></div>
+
 <script src="../js/api.js"></script>
-<script src="../js/auth.js"></script>
+<script src="../js/utils.js"></script>
 <script>
-async function loadAcceptedAdmin() {
-  const box = document.getElementById("accepted-admin-box");
-  const data = await api.get("/admin/accepted-offers");
+function doLogout() { localStorage.removeItem('token'); window.location.href = '/login.html'; }
 
-  if (!data.length) {
-    box.innerHTML = "<p class='muted'>No accepted offers yet.</p>";
-    return;
+async function loadAccepted() {
+  const box = document.getElementById('accepted-list');
+  box.innerHTML = '<div class="loading-state"><div class="spinner"></div><p>Loading…</p></div>';
+  try {
+    const rows = await api.get('/admin/accepted-offers');
+    if (!rows.length) {
+      box.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i><p>No accepted offers yet.</p></div>';
+      return;
+    }
+    box.innerHTML = '';
+    rows.forEach(r => {
+      const div = document.createElement('div');
+      div.className = 'tender-item status-accepted';
+      div.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem;margin-bottom:.75rem;">
+          <h3 style="margin:0;">${r.tender_title}</h3>
+          <span class="badge accepted"><i class="fas fa-check" style="margin-right:.25rem;"></i>Accepted</span>
+        </div>
+        <p style="margin-bottom:.5rem;"><i class="fas fa-user" style="color:var(--primary-light);margin-right:.4rem;"></i>${r.applicant_email}</p>
+        ${r.offer && r.offer.message ? `
+          <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.85rem;margin-top:.5rem;font-size:0.87rem;color:var(--text-2);">
+            <span style="font-size:0.75rem;text-transform:uppercase;letter-spacing:.5px;color:var(--text-3);display:block;margin-bottom:.3rem;">Offer Message</span>
+            ${r.offer.message}
+          </div>
+        ` : ''}
+        <p style="font-size:0.78rem;color:var(--text-3);margin-top:.5rem;">Application #${r.application_id}</p>
+      `;
+      box.appendChild(div);
+    });
+  } catch {
+    box.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>Failed to load accepted offers.</p></div>';
   }
-
-  box.innerHTML = "";
-  data.forEach(o => {
-    const div = document.createElement("div");
-    div.className = "item status-accepted";
-    div.innerHTML = `
-      <h3>${o.tender_title}</h3>
-      <p><b>Applicant:</b> ${o.applicant_email}</p>
-      <p>${o.offer?.message || ""}</p>
-    `;
-    box.appendChild(div);
-  });
 }
 
-loadAcceptedAdmin();
+(async () => {
+  try {
+    const user = await api.get('/auth/me');
+    if (!user || user.role !== 'admin') { window.location.href = '/login.html'; return; }
+    loadAccepted();
+  } catch { window.location.href = '/login.html'; }
+})();
 </script>
 
 </body>

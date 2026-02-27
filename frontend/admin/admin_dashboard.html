@@ -1,50 +1,108 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Admin Dashboard — OPTIBIDS-RFP</title>
-
-  <link rel="stylesheet" href="../css/styles.css">
-  <link rel="stylesheet" href="../css/dashboard.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin Dashboard — OPTIBOTS</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
 </head>
-
 <body>
 
-<nav class="dash-navbar">
-  <div class="dash-logo">OPTIBIDS-RFP</div>
-  <ul class="dash-menu">
-    <li><a href="admin_dashboard.html" class="active">Dashboard</a></li>
-    <li><a href="create_tender.html">Create Tender</a></li>
-    <li><a href="admin_accepted.html">Accepted Offers</a></li>
-    <li><a onclick="auth.logout()" style="cursor:pointer;">Logout</a></li>
-  </ul>
-    
-</nav>
+<div class="dash-layout">
 
-<main class="dash-container">
+  <!-- SIDEBAR -->
+  <aside class="dash-sidebar">
+    <div class="dash-sidebar-logo">OPTIBOTS</div>
+    <ul class="dash-nav">
+      <li><a href="admin_dashboard.html" class="active"><span class="nav-icon"><i class="fas fa-tachometer-alt"></i></span>Dashboard</a></li>
+      <li><a href="create_tender.html"><span class="nav-icon"><i class="fas fa-plus-circle"></i></span>Create Tender</a></li>
+      <li><a href="admin_accepted.html"><span class="nav-icon"><i class="fas fa-handshake"></i></span>Accepted Offers</a></li>
+      <div class="nav-separator"></div>
+      <li class="logout"><button onclick="doLogout()"><span class="nav-icon"><i class="fas fa-sign-out-alt"></i></span>Logout</button></li>
+    </ul>
+  </aside>
 
-  <section class="section-card">
-    <h2>Recent Applications</h2>
-    <div id="recent-apps" class="card-list"></div>
-  </section>
+  <!-- MAIN CONTENT -->
+  <main class="dash-main">
+    <div class="dash-header">
+      <h1>Admin Dashboard</h1>
+      <p>Manage tenders, review applications, and send offers.</p>
+    </div>
 
-  <section class="section-card" style="margin-top:2rem;">
-    <h2>All Tenders</h2>
-    <div id="tenders-list" class="card-list"></div>
-  </section>
+    <!-- STATS -->
+    <div class="stats-grid" id="stats-row">
+      <div class="stat-card">
+        <div class="stat-icon purple"><i class="fas fa-file-contract"></i></div>
+        <div class="stat-info"><h3 id="stat-tenders">—</h3><p>Active Tenders</p></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon blue"><i class="fas fa-users"></i></div>
+        <div class="stat-info"><h3 id="stat-apps">—</h3><p>Total Applications</p></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon green"><i class="fas fa-check-circle"></i></div>
+        <div class="stat-info"><h3 id="stat-accepted">—</h3><p>Accepted Offers</p></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon amber"><i class="fas fa-clock"></i></div>
+        <div class="stat-info"><h3 id="stat-pending">—</h3><p>Pending Review</p></div>
+      </div>
+    </div>
 
-</main>
+    <!-- RECENT APPLICATIONS -->
+    <div class="section-card">
+      <div class="section-card-header">
+        <h2><i class="fas fa-inbox"></i> Recent Applications</h2>
+        <a href="#" onclick="admin.loadRecentApps()" class="btn-icon" title="Refresh"><i class="fas fa-sync-alt"></i></a>
+      </div>
+      <div id="recent-apps" class="card-list">
+        <div class="loading-state"><div class="spinner"></div><p>Loading applications…</p></div>
+      </div>
+    </div>
+
+    <!-- TENDERS LIST -->
+    <div class="section-card">
+      <div class="section-card-header">
+        <h2><i class="fas fa-file-contract"></i> All Tenders</h2>
+        <a href="create_tender.html" class="auth-btn primary small"><i class="fas fa-plus"></i> New Tender</a>
+      </div>
+      <div id="tenders-list" class="card-list">
+        <div class="loading-state"><div class="spinner"></div><p>Loading tenders…</p></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div id="toast-container"></div>
 
 <script src="../js/api.js"></script>
-<script src="../js/auth.js"></script>
+<script src="../js/utils.js"></script>
 <script src="../js/admin.js"></script>
-
 <script>
-document.querySelectorAll(".dash-menu a").forEach(link => {
-  if (link.href === window.location.href) {
-    link.classList.add("active");
+function doLogout() {
+  localStorage.removeItem('token');
+  window.location.href = '/login.html';
+}
+
+// Guard: redirect if not logged in / not admin
+(async () => {
+  try {
+    const user = await api.get('/auth/me');
+    if (!user || user.role !== 'admin') {
+      window.location.href = '/login.html';
+      return;
+    }
+    // Load data
+    admin.loadTenders();
+    admin.loadRecentApps();
+    admin.loadStats();
+  } catch {
+    window.location.href = '/login.html';
   }
-});
+})();
 </script>
 
 </body>

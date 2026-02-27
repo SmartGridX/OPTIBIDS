@@ -1,41 +1,257 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Review Application</title>
-  <link rel="stylesheet" href="../css/styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Review Application — OPTIBOTS</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
 </head>
 <body>
 
-<nav class="dash-navbar">
-  <div class="dash-logo">OPTIBIDS-RFP</div>
-  <ul class="dash-menu">
-    <li><a href="admin_dashboard.html">Dashboard</a></li>
-    <li><a onclick="auth.logout()">Logout</a></li>
-  </ul>
-</nav>
+<div class="dash-layout">
+  <!-- SIDEBAR -->
+  <aside class="dash-sidebar">
+    <div class="dash-sidebar-logo">OPTIBOTS</div>
+    <ul class="dash-nav">
+      <li><a href="admin_dashboard.html"><span class="nav-icon"><i class="fas fa-tachometer-alt"></i></span>Dashboard</a></li>
+      <li><a href="create_tender.html"><span class="nav-icon"><i class="fas fa-plus-circle"></i></span>Create Tender</a></li>
+      <li><a href="admin_accepted.html"><span class="nav-icon"><i class="fas fa-handshake"></i></span>Accepted Offers</a></li>
+      <div class="nav-separator"></div>
+      <li class="logout"><button onclick="doLogout()"><span class="nav-icon"><i class="fas fa-sign-out-alt"></i></span>Logout</button></li>
+    </ul>
+  </aside>
 
-<div class="form-container">
-  <div class="form-card">
-    <h2>Application Review</h2>
+  <!-- MAIN -->
+  <main class="dash-main">
+    <div class="dash-header">
+      <div style="display:flex;align-items:center;gap:1rem;">
+        <a href="admin_dashboard.html" class="btn-icon" title="Back"><i class="fas fa-arrow-left"></i></a>
+        <div>
+          <h1>Review Application</h1>
+          <p>Review vendor proposal and send an offer or run AI evaluation.</p>
+        </div>
+      </div>
+    </div>
 
-    <pre id="app-text"></pre>
+    <div style="display:grid;grid-template-columns:1fr 380px;gap:1.75rem;align-items:start;" id="review-grid">
 
-    <textarea id="offer-text"
-      placeholder="Write offer details here..."
-      class="auth-input"></textarea>
+      <!-- APPLICATION DETAIL -->
+      <div>
+        <div class="section-card">
+          <div class="section-card-header">
+            <h2><i class="fas fa-user"></i> Application Details</h2>
+            <div id="app-status-badge"></div>
+          </div>
+          <div id="app-meta" style="display:flex;gap:1.5rem;flex-wrap:wrap;margin-bottom:1rem;font-size:0.88rem;">
+            <span style="color:var(--text-2);"><i class="fas fa-envelope" style="margin-right:.35rem;color:var(--primary-light);"></i><span id="app-email">—</span></span>
+            <span style="color:var(--text-2);"><i class="fas fa-file-contract" style="margin-right:.35rem;color:var(--primary-light);"></i><span id="app-tender">—</span></span>
+          </div>
+          <div id="app-text" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;font-size:0.88rem;color:var(--text-2);white-space:pre-wrap;line-height:1.75;min-height:160px;">
+            <div class="loading-state"><div class="spinner"></div><p>Loading application…</p></div>
+          </div>
+        </div>
 
-    <button class="auth-btn primary"
-      onclick="admin.sendOffer()">
-      Send Offer
-    </button>
-  </div>
+        <!-- AI SUMMARY -->
+        <div id="ai-summary-wrapper" style="display:none;">
+          <div class="ai-panel" id="ai-panel">
+            <div class="ai-panel-header">
+              <div class="ai-icon"><i class="fas fa-robot"></i></div>
+              <div>
+                <h3>AI Evaluation Report</h3>
+                <p style="font-size:0.78rem;color:var(--text-3);margin:0;">Powered by phi3:mini · Ollama</p>
+              </div>
+            </div>
+            <div id="ai-panel-content"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- OFFER PANEL -->
+      <div>
+        <div class="section-card">
+          <div class="section-card-header">
+            <h2><i class="fas fa-brain"></i> AI Evaluation</h2>
+          </div>
+          <p style="font-size:0.85rem;color:var(--text-2);margin-bottom:1rem;">
+            Run the AI pipeline to extract requirements, match SKUs, compute pricing, and identify the best applicant.
+          </p>
+          <button class="auth-btn primary" style="width:100%;" id="ai-btn" onclick="runAI()">
+            <i class="fas fa-magic"></i> Generate AI Summary
+          </button>
+        </div>
+
+        <div class="section-card" style="margin-top:0;">
+          <div class="section-card-header">
+            <h2><i class="fas fa-paper-plane"></i> Send Offer</h2>
+          </div>
+          <p style="font-size:0.85rem;color:var(--text-2);margin-bottom:.75rem;">Compose a personalized offer message for this applicant.</p>
+          <div class="form-row">
+            <label for="offer-text">Offer Message</label>
+            <textarea id="offer-text" class="auth-input form-input" placeholder="Thank you for your proposal. We are pleased to offer you…" style="min-height:120px;"></textarea>
+          </div>
+          <button class="auth-btn primary" style="width:100%;" id="offer-btn" onclick="sendOffer()">
+            <i class="fas fa-paper-plane"></i> Send Offer
+          </button>
+          <p id="offer-msg" style="margin-top:.75rem;font-size:0.82rem;text-align:center;"></p>
+        </div>
+      </div>
+    </div>
+  </main>
 </div>
 
+<div id="toast-container"></div>
+
 <script src="../js/api.js"></script>
-<script src="../js/auth.js"></script>
-<script src="../js/admin.js"></script>
+<script src="../js/utils.js"></script>
 <script>
-  admin.loadApplicationForReview();
+
+function doLogout() { localStorage.removeItem('token'); window.location.href = '/login.html'; }
+
+const appId = localStorage.getItem('review_app_id');
+let currentTenderId = null;
+
+async function loadApp() {
+  if (!appId) { showToast('No application selected', 'error'); return; }
+
+  try {
+    const app = await api.get(`/admin/applications/${appId}`);
+    currentTenderId = app.tender_id || null;
+
+    document.getElementById('app-email').textContent  = app.user_email;
+    document.getElementById('app-tender').textContent = app.tender_title;
+
+    const badge = app.status;
+    document.getElementById('app-status-badge').innerHTML =
+      `<span class="badge ${badge}">${badge}</span>`;
+
+    document.getElementById('app-text').textContent = app.applicant_text || 'No proposal text submitted.';
+  } catch {
+    document.getElementById('app-text').textContent = 'Failed to load application details.';
+  }
+}
+
+async function runAI() {
+  const btn = document.getElementById('ai-btn');
+
+  // Get tender id from app data
+  if (!currentTenderId) {
+    // try to read from app
+    try {
+      const app = await api.get(`/admin/applications/${appId}`);
+      currentTenderId = app.tender_id;
+    } catch { showToast('Unable to determine tender ID', 'error'); return; }
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Running AI Pipeline…';
+
+  try {
+    const res = await api.post(`/admin/tenders/${currentTenderId}/summary`, {});
+    const wrapper = document.getElementById('ai-summary-wrapper');
+    wrapper.style.display = 'block';
+
+    if (res.error) {
+      document.getElementById('ai-panel-content').innerHTML =
+        `<p style="color:var(--text-2);font-size:0.9rem;">${res.error}</p>`;
+      showToast(res.error, 'info');
+      return;
+    }
+
+    const best = res.best_application;
+    const others = res.comparison || [];
+
+    document.getElementById('ai-panel-content').innerHTML = `
+      <div class="best-applicant-card">
+        <h4><i class="fas fa-trophy"></i> Best Applicant</h4>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;font-size:0.88rem;">
+          <div><span style="color:var(--text-3);font-size:0.76rem;display:block;margin-bottom:.1rem;">EMAIL</span><strong>${best.email || '—'}</strong></div>
+          <div><span style="color:var(--text-3);font-size:0.76rem;display:block;margin-bottom:.1rem;">PRICE</span><strong>${best.price || '—'}</strong></div>
+          <div><span style="color:var(--text-3);font-size:0.76rem;display:block;margin-bottom:.1rem;">SKU</span><strong>${best.sku || '—'}</strong></div>
+          <div><span style="color:var(--text-3);font-size:0.76rem;display:block;margin-bottom:.1rem;">VERDICT</span><strong style="color:var(--accent-green);">${best.verdict || '—'}</strong></div>
+        </div>
+        ${best.brief ? `<p style="margin-top:.75rem;font-size:0.85rem;color:var(--text-2);">${best.brief}</p>` : ''}
+      </div>
+
+      ${others.length ? `
+        <h4 style="font-size:0.9rem;margin-bottom:.75rem;color:var(--text-2);">All Applicants Compared</h4>
+        <div style="overflow-x:auto;">
+          <table class="comparison-table">
+            <thead><tr>
+              <th>Email</th><th>Price</th><th>Strengths</th><th>Weaknesses</th>
+            </tr></thead>
+            <tbody>
+              ${others.map(a => `
+                <tr>
+                  <td>${a.email}</td>
+                  <td>${a.price}</td>
+                  <td style="color:var(--accent-green);">${(Array.isArray(a.strengths) ? a.strengths : [a.strengths || '—']).join(', ')}</td>
+                  <td style="color:var(--accent-red);">${(Array.isArray(a.weaknesses) ? a.weaknesses : [a.weaknesses || '—']).join(', ')}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      ` : ''}
+    `;
+
+    showToast('AI evaluation complete!', 'success');
+  } catch (err) {
+    document.getElementById('ai-panel-content').innerHTML =
+      `<p style="color:var(--accent-red);font-size:0.9rem;"><i class="fas fa-exclamation-circle"></i> AI evaluation failed. Ensure Ollama is running.</p>`;
+    showToast('AI evaluation failed', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-magic"></i> Regenerate Summary';
+  }
+}
+
+async function sendOffer() {
+  const text = document.getElementById('offer-text').value.trim();
+  const btn  = document.getElementById('offer-btn');
+  const msg  = document.getElementById('offer-msg');
+
+  if (!text) { showToast('Please write an offer message', 'error'); return; }
+
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending…';
+
+  try {
+    await api.post(`/admin/applications/${appId}/offer`, { message: text });
+    msg.innerHTML = '<span style="color:var(--accent-green);"><i class="fas fa-check-circle"></i> Offer sent successfully!</span>';
+    showToast('Offer sent to vendor!', 'success');
+    btn.innerHTML = '<i class="fas fa-check"></i> Offer Sent';
+  } catch {
+    msg.innerHTML = '<span style="color:var(--accent-red);">Failed to send offer. Try again.</span>';
+    showToast('Failed to send offer', 'error');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Offer';
+  }
+}
+
+function showToast(msg, type='info') {
+  const icons = { success:'fa-check-circle', error:'fa-times-circle', info:'fa-info-circle' };
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `<i class="fas ${icons[type]}"></i><span>${msg}</span>`;
+  document.getElementById('toast-container').appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+}
+
+// Auth guard + load
+(async () => {
+  try {
+    const user = await api.get('/auth/me');
+    if (!user || user.role !== 'admin') { window.location.href = '/login.html'; return; }
+    loadApp();
+  } catch { window.location.href = '/login.html'; }
+})();
+
+// Responsive grid on small screens
+if (window.innerWidth < 760) {
+  document.getElementById('review-grid').style.gridTemplateColumns = '1fr';
+}
 </script>
 
 </body>

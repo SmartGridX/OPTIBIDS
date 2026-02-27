@@ -94,12 +94,14 @@ def admin_list_applications(admin: User = Depends(require_admin)):
         return [
             {
                 "id": a.id,
+                "tender_id": a.tender_id,
                 "user_email": users.get(a.user_id).email if a.user_id in users else "Unknown",
                 "tender_title": tenders.get(a.tender_id).title if a.tender_id in tenders else "Unknown",
                 "status": a.status or "submitted",
             }
             for a in apps
         ]
+
 
 # -------------------------------------------------
 # GET SINGLE APPLICATION
@@ -116,6 +118,7 @@ def get_application(application_id: int, admin: User = Depends(require_admin)):
 
         return {
             "id": app.id,
+            "tender_id": app.tender_id,
             "tender_title": tender.title if tender else "Unknown",
             "user_email": user.email if user else "Unknown",
             "applicant_text": app.applicant_text,

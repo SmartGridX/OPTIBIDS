@@ -12,13 +12,15 @@ services:
 
 
   backend:
-    build: ./backend
+    build: ./Backend
     ports:
       - "8000:8000"
     volumes:
-      - ./backend/app:/app/app
+      - ./Backend/app:/app/app
     depends_on:
       - ollama
+    environment:
+      - OLLAMA_BASE=http://ollama:11434
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
   frontend:

@@ -1,11 +1,13 @@
 # backend/app/ai_agent.py
 
+import os
 import requests
 import json
 import hashlib
 from typing import List, Dict
 
-OLLAMA_BASE = "http://ollama:11434"
+# Works inside Docker (service name = "ollama") and locally (localhost)
+OLLAMA_BASE = os.environ.get("OLLAMA_BASE", "http://localhost:11434")
 OLLAMA_GENERATE = f"{OLLAMA_BASE}/api/generate"
 MODEL = "phi3:mini"
 
@@ -195,9 +197,9 @@ Applications:
     # Call Ollama
     # ---------------------------
     r = requests.post(
-        "http://ollama:11434/api/generate",
+        OLLAMA_GENERATE,
         json={
-            "model": "phi3:mini",
+            "model": MODEL,
             "prompt": prompt,
             "stream": False
         },
